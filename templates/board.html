@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>공군 병사 통합 홈페이지</title>
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/font.css') }}"/>
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/button.css') }}"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    </head>
+    <body>
+        <div class="top_section">
+            <header class="header">
+                <div class="header_nav">
+                    <button class="header_title" onclick="location.href='/'">
+                        <img src="{{ url_for('static', filename='image/af_logo.svg') }}" class="header_nav_aflogo">
+                        <h1 class="header_nav_h1">병사 통합 홈페이지</h1>
+                    </button>
+                    <nav>
+                        <button class="element_round_button main_button">게시판</button>
+                        <button class="element_round_button main_button">캘린더</button>
+                        <button class="element_round_button main_button">친구관리</button>
+                    </nav>
+                </div>
+                <button class="profile">
+                    <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
+                </button>
+            </header>
+
+
+            <sction class="content_section">
+                <div style="height: 110px"></div>
+
+                {%for post in post_list%}
+                <div class="post_card">
+                    <div class="post_header">
+                            <div class="post_header_head">
+                                <h3 class="post_header_title">{{post['title']}}</h3>
+                                <button class="post_header_head_userinfo">
+                                    <!--TODO 사용자 계정 사진-->
+                                    <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile_img">
+                                    <p class="post_heder_head_username">{{post['user']}}</p>
+                                </button>
+                            </div>
+                            <!--TODO db 자신이 쓴 글만 한사람만 보이게-->
+                            <div class="post_user_button">
+                                <button id="edit_button" class="user_button" title="수정하기">
+                                    <span class="material-symbols-rounded">edit</span>
+                                </button> 
+                                <button id="delete_button" class="user_button" title="삭제하기">
+                                    <span class="material-symbols-rounded">close</span>
+                                </button>  
+                            </div>
+                        </div>
+                        <div class="post_content">
+                            <p style="margin-bottom: 0;margin-top: 5px;">{{post['content']}}</p>
+                        </div>
+                        <div class="post_button_section">
+                            <div class="reaction_button_section">
+                                    <button class="response_button" id="favorite_button">
+                                        <span class="material-symbols-rounded">favorite</span>
+                                        <span>{{post['favorite']}}</span>
+                                    </button>
+                                    <button class="response_button" id="icon_circle_button">
+                                        <span class="material-symbols-rounded">bookmark</span>
+                                    </button>
+                                    <p class="post_heder_head_username">{{post['created']}}</p>
+                            </div>
+                            <button class="response_button" id="icon_circle_button">
+                                <span class="material-symbols-rounded">forum</span>
+                            </button>
+                        </div>
+                </div>
+                {%endfor%}
+
+            </sction>
+        </div>
+    </body>
+</html>

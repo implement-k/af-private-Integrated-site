@@ -1,0 +1,19 @@
+h1, p, button, span, input, div {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.noto_black {
+    font-weight: 900;
+}
+
+.noto_bold {
+    font-weight: 700;
+}
+
+.noto_regular {
+    font-weight: 400;
+}
+
+.noto_light {
+    font-weight: 300;
+}

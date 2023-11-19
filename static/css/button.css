@@ -1,0 +1,141 @@
+.element_round_button {
+    border: 0;
+    border-radius: 25px;
+    cursor:pointer;
+}
+
+.main_button{
+    height:50px;
+    width:120px;
+    margin:0 13px 0 0;
+    font-size:medium;
+    background-color: rgba(28,51,91,20%);
+    backdrop-filter: blur(10px);
+    transition: box-shadow .5s ease 0s;
+    &:hover {
+        box-shadow: 0 0 6px .1px rgba(28,51,91);
+    }
+}
+
+.login_button{
+    height:60px;
+    margin:20px 0 0 0;
+    font-size:medium;
+    border-radius: 25px;
+    transition: all .3s ease 0s;
+    &#signup{
+        width:120px;
+        background-color: rgb(235,235,235);
+        margin-right: 20px;
+    }
+    &#signin{
+        flex-grow: 1;
+        background-color: rgb(235,235,235);
+        cursor:auto;
+    }
+}
+
+.user_button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height:12px;
+    width:12px;
+    border:0px;
+    border-radius:6px;
+    padding:1px;
+    margin-left: 6px;
+    transition: all .5s ease;
+    &:hover {
+        height: 22px;
+        width: 22px;
+        border-radius:11px;
+        & span{
+            font-size:medium;
+            opacity:1;
+        }
+    }
+    &>span{
+        font-size: x-small;
+        opacity: 0;
+        transition: all .5s ease;
+    }
+}
+
+#edit_button {
+    background-color: rgb(235, 211, 162);
+}
+
+#delete_button {
+    background-color: rgb(233, 158, 153);
+}
+
+.response_button {
+    height:28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    border:1px solid;
+    border-radius: 14px;
+    border-color:rgb(212, 212, 212);
+    background-color: rgb(235, 235, 235);
+    margin-right: 4px;
+    &>.material-symbols-rounded{
+        font-size:medium;
+        padding-top: 1px;
+    }
+    &#favorite_button {
+        padding:0 8px 0 6px;
+    }
+    &#icon_circle_button{
+        width: 28px;
+    }
+}
+
+.signup_id {
+    border:0;
+    width:80px;
+    margin-bottom: 20px;
+    transition:all .3s ease;
+    &:focus{
+        background-color: rgb(215, 219, 228);
+        outline:0;
+    }
+    &:disabled{
+        background-color: rgb(180, 225, 170);
+    }
+}
+
+.signup_password {
+    height:30px;
+    border-radius: 0 0 25px 25px;
+    font-size:small;
+    border:0;
+    width:100%;
+    margin-bottom: 20px;
+    &:focus{
+        background-color: rgb(215, 219, 228);
+        outline:0;
+    }
+}
+
+.profile {
+    height:50px;
+    width:50px;
+    border:0;
+    padding:0;
+    border-radius:70%;
+}
+
+.big_square_button {
+    display:flex;
+    height:90px;
+    width:90px;
+    border:0;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(28,51,92);
+    cursor:pointer;
+}

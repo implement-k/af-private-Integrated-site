@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>회원가입 완료</title>
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/font.css') }}"/>
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/button.css') }}"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    </head>
+    <body class="login_body">
+        <div class="login_main login_done" style="display:flex;flex-direction: row;justify-content: space-between;align-items: center;">
+            <div style="display: flex;flex-direction: column;">
+                <span class="material-symbols-rounded" style="font-size: 60px;">verified</span>
+                <p style="margin:0;font-size: large;font-weight: 800;">회원가입 완료</p>
+            </div>
+            <button class="big_square_button" onclick="location.href='/'">
+                <span class="material-symbols-rounded" style="font-size: 60px;color:rgb(235,235,235);">navigate_next</span>
+            </button>
+        </div>
+    </body>
+</html>
