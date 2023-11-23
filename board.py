@@ -1,7 +1,10 @@
-from flask import Flask, render_template,url_for,request
-from connect_afpsDB import con
+from flask import Flask, render_template, url_for, request, session, redirect
+from connect_afpsDB import U,P,H,D
+import pymysql
+import uuid
 
 app = Flask(__name__)
+app.secret_key = uuid.uuid4().hex
 
 post_list = [
     {'id':'1', 'favorite':0, 'user':'권구현', 'title':'제목제목asdfasdfasdf', 'content':'ㅁㄴㅇㄻㄴㅇㄻㄴㅇㄻㄴㅇㄻㄴㅇㄻㄹㄴㅇ', 'created':'11'},
@@ -12,28 +15,63 @@ post_list = [
 ]
 # TODO db
 
-@app.route('/login/')
+@app.route('/login/',methods=['POST', 'GET'])
 def login():
-    return render_template('login.html')
+    if request.method == 'POST':
+        uid = request.form.get('id')
+        upw = request.form.get('password')
+        con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+        cur = con.cursor()
+        cur.execute("SELECT * FROM user WHERE u_id = '{0}' AND u_pw = '{1}';".format(uid, upw))
+        t = cur.fetchone()
+        con.close()
+        if t:
+            session["id"] = uid
+            return redirect('/')
+        else:
+            return render_template('login.html')
+    else:
+        if "id" in session:
+            return redirect('/')
+        else:
+            return render_template('login.html')
 
 @app.route('/signup/',methods=['POST', 'GET'])
 def signup():
     if request.method == 'POST':
-        # try:
+        try:
             uid = request.form.get('id')
             upw = request.form.get('pw_dub')
-            upn = request.form.get('num')
-            upn.replace('-', '')
+            upn = request.form.get('num').replace("-", "")
+            con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
             cur = con.cursor()
             cur.execute("INSERT INTO user(u_id,u_pw,u_phoneNum) VALUES ('{0}','{1}','{2}');".format(uid,upw,upn))
             con.commit()
             con.close()
             return render_template('signup_done.html')
-        # except:
-        #     return 'error'
-        
+        except:
+            return 'error'
     else:
-        return render_template('signup.html')
+        if "id" in session:
+            return redirect('/')
+        else:
+            return render_template('signup.html')
+
+@app.route('/isDub',methods=['POST'])
+def dubCheck():
+    try:
+        name = request.form['name']
+        value = request.form['value']
+        con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+        cur = con.cursor()
+        cur.execute("SELECT {0} FROM user WHERE {0}='{1}'".format(name, value))
+        t = cur.fetchall()
+        con.close()
+        return str(len(t)) #중복이면 1, 중복 아니면 0
+    except Exception as e:
+        return "error"
+        
+
 
 @app.route('/board/')
 def board():
@@ -41,6 +79,9 @@ def board():
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    if "id" in session: 
+        return render_template('home.html', isLogin = True)
+    else:
+        return render_template('home.html', isLogin = False)
 
 app.run(debug=True)

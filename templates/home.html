@@ -1,15 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
+        {% include "header.html"%}
         <title>공군 병사 통합 홈페이지</title>
-        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
-        <link rel="stylesheet" href=" {{ url_for('static', filename='css/font.css') }}"/>
-        <link rel="stylesheet" href=" {{ url_for('static', filename='css/button.css') }}"/>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     </head>
     <body>
         <div class="top_section">
@@ -24,9 +17,13 @@
                         <button class="element_round_button main_button">친구관리</button>
                     </nav>
                 </div>
-                <button class="profile">
-                    <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
-                </button>
+                {% if isLogin %}
+                    <button class="profile">
+                        <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
+                    </button>
+                {% else %}
+                    <button class="element_round_button main_login_button" onclick="location.href='/login'">로그인</button>
+                {% endif %}
             </header>
         <section class="home_content_section">
             <div style="height: 110px;"></div>

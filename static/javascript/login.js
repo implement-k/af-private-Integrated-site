@@ -1,6 +1,7 @@
 var is_id_done = false;
 var is_password_done = false;
 var is_phone_done = false;
+var is_num_dub = false;
 
 function paint_login_button(){
     $("#id, #password").on("propertychange change keyup paste input", function(){
@@ -8,7 +9,7 @@ function paint_login_button(){
         let pw = $("#password").val();
         if (id.length > 1 && pw.length > 1) {
             $("#signin").css({"background-color":"rgb(240, 160, 5)","cursor":"pointer"});
-        } else if (id.length <= 1 || pw.length <= 1) {
+        } else {
             $("#signin").css({"background-color":"rgb(235, 235, 235)","cursor":"auto"});
         };
     });
@@ -17,17 +18,37 @@ function paint_login_button(){
 function is_id_dub(){
     let id = $('#id').val();
     if (id.length === 0) {
-        $('#id').attr("placeholder","아이디를 입력해주세요!");
-        $('#id').css("background-color","rgb(224, 173, 173)");
-    } else if (!(/[._0-9a-zA-Z가-힣]/g.test(id))) {
-        $('#id').val('').attr("placeholder","한글, 영어, 숫자, 허용된 특수기호(._)만 입력하세요.").css("background-color","rgb(224, 173, 173)")
-    } else if (id === "asd") { //TODO 중복일 경우
-        $('#id').val('').attr("placeholder","다른 아이디를 사용해 주세요.").css("background-color","rgb(224, 173, 173)")
-    } else { //TODO 정상적인 아이디일 경우
-        $('#id_dub').attr("disabled",true)
-        alert('사용 가능한 아이디')
-        is_id_done = true;
-    };
+        $('#id').attr("placeholder","아이디를 입력해주세요.").css("background-color","rgb(224, 173, 173)");
+    } else if (!(/[\._0-9a-zA-Z가-힣]/g.test(id))) {
+        $('#id').val('').attr("placeholder","한글, 영어, 숫자, 허용된 특수기호(._)만 입력하세요.").css("background-color","rgb(224, 173, 173)");
+    } else if (id.length > 20) {
+        $('#id').val('').attr("placeholder","20자 이내로 입력해주세요.").css("background-color","rgb(224, 173, 173)");
+    } else {
+        var dub = 'e';
+        $.ajax({
+            type: "POST",
+            url: '/isDub',
+            async: false,
+            data: {
+                'name':'u_id',
+                'value':id
+            },
+            success : function(result) {
+                dub = result;
+            },
+            error : function(request, status, error) {
+                dub = "e";
+            }
+        });
+        if (dub === "1") { //아이디 중복일 경우
+            $('#id').val('').attr("placeholder","중복되는 아이디입니다.").css("background-color","rgb(224, 173, 173)")
+        } else if (dub === "e") {
+            $('#id').val('').attr("placeholder","DB오류").css("background-color","rgb(224, 173, 173)")
+        }else { // 정상적인 아이디
+            $('#id_dub').attr("disabled",true)
+            is_id_done = true;
+        };
+    }
 };
 
 const is_password_able = (target) => {
@@ -65,20 +86,36 @@ const autoHyphen = (target) => {
     } else {is_phone_done = false;};
 };
 
+
 function paint_id_original(){
     $("#id").on("propertychange change keyup paste input", function(){
-        $("#id").css("background-color","rgb(235, 235, 235)")
-        $("#id").attr("placeholder","")
-        $('.response_button.signup_id').attr("disabled",false)
+        $("#id").css("background-color","rgb(235, 235, 235)").attr("placeholder","");
+        $('.response_button.signup_id').attr("disabled",false);
     });
 };
 
 function paint_signup_button() {
     $("#id, #password, #pw_dub, #num").on("propertychange change keyup paste input", function(){
         if (is_id_done && is_password_done && is_phone_done) {
-            $("#signin").css({"background-color":"rgb(202, 206, 214)","cursor":"pointer"});
+            $("#signin").css({"background-color":"rgb(202, 206, 214)","cursor":"pointer"}).attr("disabled", false);
         } else {
             $("#signin").css({"background-color":"rgb(235, 235, 235)","cursor":"auto"});
+        };
+    });
+};
+
+function prevent_signup_enter() {
+    window.addEventListener('keydown', function (e) {
+        if (e.code === "Enter") {
+            if (!(is_id_done && is_password_done && is_phone_done)) {e.preventDefault();};
+        };
+    });
+};
+
+function prevent_signin_enter() {
+    window.addEventListener('keydown', function (e) {
+        if (e.code === "Enter") {
+            if (id.length <= 1 || pw.length <= 1) {e.preventDefault();};
         };
     });
 };

@@ -1,23 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
+        {% include "header.html"%}
         <title>공군 병사 통합 홈페이지-회원가입</title>
-        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
-        <link rel="stylesheet" href=" {{ url_for('static', filename='css/login.css') }}"/>
-        <link rel="stylesheet" href=" {{ url_for('static', filename='css/font.css') }}"/>
-        <link rel="stylesheet" href=" {{ url_for('static', filename='css/button.css') }}"/>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script src=" {{ url_for('static', filename='javascript/login.js') }}"></script>
-        <meta name="google" content="notranslate">
     </head>
     <body class="login_body">
         <div class="login_main">
-            <button class="header_title login_title" onclick="location.href='/home/'" style="flex-direction: column;">
+            <button class="header_title login_title" onclick="location.href='/'" style="flex-direction: column;">
                 <h1 class="header_nav_h1">공군 병사 통합 홈페이지</h1>
                 <p class="header_nav_p">오신 것을 환영합니다! - 회원가입</p>
             </button>
@@ -34,17 +25,15 @@
                 </div>
                 <div class="signup_text_section">
                     <div class="signup_label password_2"><p>확인</p></div>
-                    <input class="signup_input_4" type="password" id="pw_dub" name="password" oninput="is_password_same(this)">
+                    <input class="signup_input_4" type="password" id="pw_dub" name="pw_dub" oninput="is_password_same(this)">
                 </div>
                 <div class="response_button signup_password" id="signup_pw_info">숫자와 알파벳을 포함하여 8자리 이상으로 설정해주세요.</div>
                 <div class="signup_text_section" style="margin-bottom:5px;">
                     <div class="signup_label"><p>전화번호</p></div>
                     <input class="signup_input_1" type="text" id="num" name="num" oninput="autoHyphen(this)">
                 </div>
-                <script>paint_signup_button()</script>
-                <div style="display: flex;">
-                    <input type="submit" class="login_button" id="signin" value="회원가입">
-                </div>
+                <script>paint_signup_button();prevent_signup_enter()</script>
+                <button class="login_button" id="signin" style="border:0" disabled>회원가입</button>
             </form>
         </div>
     </body>

@@ -17,6 +17,18 @@
     }
 }
 
+.main_login_button{
+    height:50px;
+    width:120px;
+    margin:0 13px 0 0;
+    font-size:medium;
+    background-color: rgb(235, 235, 235);
+    transition: box-shadow .5s ease 0s;
+    &:hover {
+        box-shadow: 0 0 6px .1px rgb(175,175,175);
+    }
+}
+
 .login_button{
     height:60px;
     margin:20px 0 0 0;

@@ -175,7 +175,6 @@ body, html {
 .login_form {
     display:flex;
     flex-direction: column;
-    background-color: rgb(235, 235, 235);
     width:100%;
     border-radius: 25px;
     box-sizing: border-box;
