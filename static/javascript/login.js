@@ -8,9 +8,9 @@ function paint_login_button(){
         let id = $("#id").val();
         let pw = $("#password").val();
         if (id.length > 1 && pw.length > 1) {
-            $("#signin").css({"background-color":"rgb(240, 160, 5)","cursor":"pointer"});
+            $("#signin").css({"background-color":"rgb(240, 160, 5)","cursor":"pointer"}).attr("disabled", false);
         } else {
-            $("#signin").css({"background-color":"rgb(235, 235, 235)","cursor":"auto"});
+            $("#signin").css({"background-color":"rgb(235, 235, 235)","cursor":"auto"}).attr("disabled", true);
         };
     });
 };
@@ -56,10 +56,12 @@ const is_password_able = (target) => {
     if (!(/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z0-9]{8,25}$/.test(pw))) {
         $('#signup_pw_info').css("background-color","rgb(224, 173, 173)");
         $('#pw_dub').attr("disabled",true).attr("readonly",false).val('');
+        is_password_done = false;
     } else {
         $('#signup_pw_info').css("background-color","rgb(180, 225, 170)")
         .text("숫자와 알파벳을 포함하여 8자리 이상으로 설정해주세요.");
         $('#pw_dub').attr("disabled",false).attr("readonly",false).val('');
+        is_password_done = false;
     };
 };
 
@@ -99,7 +101,7 @@ function paint_signup_button() {
         if (is_id_done && is_password_done && is_phone_done) {
             $("#signin").css({"background-color":"rgb(202, 206, 214)","cursor":"pointer"}).attr("disabled", false);
         } else {
-            $("#signin").css({"background-color":"rgb(235, 235, 235)","cursor":"auto"});
+            $("#signin").css({"background-color":"rgb(235, 235, 235)","cursor":"auto"}).attr("disabled", true);
         };
     });
 };

@@ -45,6 +45,11 @@
         background-color: rgb(235,235,235);
         cursor:auto;
     }
+    &#logout{
+        width:100%;
+        background-color: rgb(224, 173, 173);
+        color: rgb(80, 15, 15);
+    }
 }
 
 .user_button {

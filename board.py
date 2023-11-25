@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, request, session, redirect
 from connect_afpsDB import U,P,H,D
 import pymysql
 import uuid
+import re
 
 app = Flask(__name__)
 app.secret_key = uuid.uuid4().hex
@@ -20,6 +21,8 @@ def login():
     if request.method == 'POST':
         uid = request.form.get('id')
         upw = request.form.get('password')
+        if len(uid) == 0 or len(upw) == 0:
+            return '잘못된 접근'
         con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
         cur = con.cursor()
         cur.execute("SELECT * FROM user WHERE u_id = '{0}' AND u_pw = '{1}';".format(uid, upw))
@@ -36,6 +39,12 @@ def login():
         else:
             return render_template('login.html')
 
+@app.route('/logout/',methods=['POST'])
+def logout():
+    session.pop('id', None)
+    return redirect('/')
+
+
 @app.route('/signup/',methods=['POST', 'GET'])
 def signup():
     if request.method == 'POST':
@@ -43,6 +52,10 @@ def signup():
             uid = request.form.get('id')
             upw = request.form.get('pw_dub')
             upn = request.form.get('num').replace("-", "")
+            vid = '^[A-Za-z0-9._]{1,20}$'
+            vpw = '^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,25}$'
+            if not re.fullmatch(vid, uid) or not re.fullmatch(vpw, upw):
+                return '잘못된 접근'
             con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
             cur = con.cursor()
             cur.execute("INSERT INTO user(u_id,u_pw,u_phoneNum) VALUES ('{0}','{1}','{2}');".format(uid,upw,upn))
@@ -77,7 +90,7 @@ def dubCheck():
 def board():
     return render_template('board.html', post_list = post_list)
 
-@app.route('/')
+@app.route('/',methods=['POST', 'GET'])
 def home():
     if "id" in session: 
         return render_template('home.html', isLogin = True)

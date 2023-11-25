@@ -15,10 +15,11 @@
             <form class="login_form" method="post">
                 <input type="text" id="id" name="id" placeholder="아이디" style="border-radius: 25px 25px 0 0;">
                 <input class="signup_input_3" type="password" id="password" name="password" placeholder="비밀번호">
-                <script>paint_login_button();prevent_signin_enter()</script>
+                <script>paint_login_button()</script>
+                <script>prevent_signin_enter()</script>
                 <div style="display: flex;">
                     <button type="button" class="element_round_button login_button" id="signup" onclick="location.href='/signup/'">회원가입</button>
-                    <button class="element_round_button login_button" id="signin" onclick="location.href='/isUser'">로그인</button>
+                    <button class="element_round_button login_button" id="signin" onclick="location.href='/isUser'" disabled>로그인</button>
                 </div>
             </form>
             

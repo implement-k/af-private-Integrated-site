@@ -18,9 +18,19 @@
                     </nav>
                 </div>
                 {% if isLogin %}
-                    <button class="profile">
-                        <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
-                    </button>
+                    
+                    <div class="dropdown">
+                        <button class="profile dropbtn">
+                            <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="#">Link 1</a>
+                            <a href="#">Link 2</a>
+                            <form method="post">
+                                <button class="element_round_button login_button" id="logout" onclick="location.href='/logout'" formmethod="POST">로그아웃</button>
+                            </form>
+                        </div>
+                    </div>
                 {% else %}
                     <button class="element_round_button main_login_button" onclick="location.href='/login'">로그인</button>
                 {% endif %}

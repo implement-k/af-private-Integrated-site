@@ -75,11 +75,7 @@ body, html {
     transition:all 1s ease;
 }
 
-@media (max-width: 800px) {
-    .content_section{
-        width:80%;
-    }
-  }
+@media (max-width: 800px) {.content_section{width:80%;};}
 
 
 .post_card{
@@ -120,9 +116,7 @@ body, html {
     flex-direction: row;
 }
 
-.post_header_title{
-    margin: 0 10px 0 0;
-}
+.post_header_title{margin: 0 10px 0 0;}
 
 .post_header_head_userinfo {
     height: 22px;
@@ -162,9 +156,7 @@ body, html {
     background-color: rgb(245, 245, 245);
 }
 
-.login_main{
-    width:450px;
-}
+.login_main{width:450px;}
 
 .login_done{
     border-radius: 25px;
@@ -226,12 +218,8 @@ body, html {
     background-color: rgb(235, 235, 235);
     height: 50px;
     margin:0;
-    &.password_1 {
-        border-radius: 25px 0 0 0;
-    }
-    &.password_2 {
-        border-radius: 0 0 0 0;
-    }
+    &.password_1 {border-radius: 25px 0 0 0;}
+    &.password_2 {border-radius: 0 0 0 0;}
 }
 
 /* home style */
@@ -260,3 +248,46 @@ body, html {
 .favorite_list_card {
     background-color: rgb(215, 219, 228);
 }
+
+
+.dropbtn {
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    transition: box-shadow .3s ease 0s;
+    &:hover {box-shadow: 0 0 6px .1px rgb(175,175,175);}
+}
+  
+.dropdown {
+    position: relative;
+    display: inline-block;
+    &:hover .dropdown-content{visibility: visible;height:200px;}
+}
+  
+
+.dropdown-content {
+    visibility: hidden;
+    position: absolute;
+    margin-top: 10px;
+    height: 0px;
+    right: 0px;
+    background-color: rgba(255,255,255,20%);
+    backdrop-filter: blur(10px);
+    min-width: 300px;
+    z-index: 1;
+    padding:20px 20px 0 20px;
+    border-radius: 25px;
+    box-shadow: 0 0 6px .1px rgb(175,175,175);
+    transition: all .5s ease 0s;
+}
+  
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+  
+  /* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd;}
