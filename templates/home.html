@@ -17,46 +17,46 @@
                         <button class="element_round_button main_button">친구관리</button>
                     </nav>
                 </div>
-                {% if isLogin %}
-                    
-                    <div class="dropdown">
-                        <button class="profile dropbtn">
-                            <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
-                        </button>
-                        <div class="dropdown-content">
-                            <a href="#">Link 1</a>
-                            <a href="#">Link 2</a>
-                            <form method="post">
-                                <button class="element_round_button login_button" id="logout" onclick="location.href='/logout'" formmethod="POST">로그아웃</button>
-                            </form>
-                        </div>
+                <div class="dropdown">
+                    <button class="profile dropbtn">
+                        <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="#">Link 1</a>
+                        <a href="#">Link 2</a>
+                        <button class="element_round_button login_button" id="logout" onclick="location.href='/logout'">로그아웃</button>
                     </div>
-                {% else %}
-                    <button class="element_round_button main_login_button" onclick="location.href='/login'">로그인</button>
-                {% endif %}
+                </div>
             </header>
         <section class="home_content_section">
-            <div style="height: 110px;"></div>
-            <div class="content_right">
-                <div class="favorite_list_card">
-                    <h2>즐겨찾기</h2>
+            <div class="content_left">
+                <div class="board_list_card favorite">
+                    <h2 style="margin-top:0">즐겨찾기</h2>
                     <div>
-                        <!-- 즐겨찾기 리스트 -->
+                        {% if postClass_likeList | length == 0 %}
+                        <p>즐겨찾는 게시판을 추가하세요.</p>
+                        {%else%}
+                        {%for cl in classLikeList%}
+                        <a href="/board/{{cl[0]}}" style="margin-top:10px;display:block;margin-bottom:0;">{{cl[1]}}</a>
+                        {%endfor%}
+                        {%endif%}
                     </div>
                 </div>
                 <div class="board_list_card">
-                    <h2>모든 게시판</h2>
+                    <h2 style="margin-top:0">모든 게시판</h2>
                     <div>
-                        <!-- 즐겨찾기 리스트 -->
+                        {%for pc in postClass_list%}
+                            <a href="/board/{{pc[0]}}" style="margin-top:10px;display:block;margin-bottom:0;">{{pc[1]}}</a>
+                        {%endfor%}
                     </div>
                 </div>
             </div>
-            <div class="content_left">
+            <div class="content_right">
                 <div>
 
                 </div>
-                <div>
-                    <h2>친구</h2>
+                <div class="board_list_card">
+                    <h2 style="margin-top:0">친구</h2>
                 </div>
             </div>
         </section>

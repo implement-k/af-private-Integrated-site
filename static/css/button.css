@@ -17,6 +17,10 @@
     }
 }
 
+.label {
+    background-color: rgba(28,51,91,60%);
+}
+
 .main_login_button{
     height:50px;
     width:120px;
@@ -145,6 +149,29 @@
     border-radius:70%;
 }
 
+.big_circle_button {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    height:50px;
+    width:50px;
+    position: relative;
+    overflow: hidden;
+    -webkit-transition: background 400ms;
+    transition: background 400ms;
+    background-color: rgb(235,235,235);
+    outline: 0;
+    border: 0;
+    border-radius: 70%;
+    -webkit-box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    margin-left: 15px;
+    &#add {
+        background-color: rgb(240,160,5);
+    }
+}
+
 .big_square_button {
     display:flex;
     height:90px;
@@ -155,4 +182,26 @@
     justify-content: center;
     background-color: rgb(28,51,92);
     cursor:pointer;
+}
+
+
+.ripple {
+    background-position: center;
+    -webkit-transition: background 0.8s;
+    transition: background 0.8s;
+    &:hover {
+        background: rgb(202,206,214) radial-gradient(circle, transparent 1%, rgb(202,206,214) 1%) center/15000%;
+        &#add{
+            background: rgb(235, 194, 114) radial-gradient(circle, transparent 1%, rgb(235, 194, 114) 1%) center/15000%;
+        }
+    }
+    &:active{
+        background-color: rgb(28,51,91);
+        background-size: 100%;
+        -webkit-transition: background 0s;
+        transition: background 0s;
+        &#add{
+            background-color: rgb(240,160,5);
+        }
+    }
 }

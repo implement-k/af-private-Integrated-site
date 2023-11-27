@@ -3,6 +3,8 @@
     <head>
         {% include "header.html"%}
         <title>공군 병사 통합 홈페이지</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src=" {{ url_for('static', filename='javascript/board.js') }}"></script>
     </head>
     <body>
         <div class="top_section">
@@ -13,14 +15,25 @@
                         <h1 class="header_nav_h1">병사 통합 홈페이지</h1>
                     </button>
                     <nav>
-                        <button class="element_round_button main_button">게시판</button>
+                        <button class="element_round_button main_button label">{{post_name}}</button>
                         <button class="element_round_button main_button">캘린더</button>
                         <button class="element_round_button main_button">친구관리</button>
                     </nav>
                 </div>
-                <button class="profile">
-                    <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
-                </button>
+                {% if uid %}
+                    <div class="dropdown">
+                        <button class="profile dropbtn">
+                            <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="#">Link 1</a>
+                            <a href="#">Link 2</a>
+                            <button class="element_round_button login_button" id="logout" onclick="location.href='/logout'">로그아웃</button>
+                        </div>
+                    </div>
+                {% else %}
+                    <button class="element_round_button main_login_button" onclick="location.href='/login'">로그인</button>
+                {% endif %}
             </header>
 
 
@@ -31,36 +44,37 @@
                 <div class="post_card">
                     <div class="post_header">
                             <div class="post_header_head">
-                                <h3 class="post_header_title">{{post['title']}}</h3>
+                                <h3 class="post_header_title">{{post[2]}}</h3>
                                 <button class="post_header_head_userinfo">
                                     <!--TODO 사용자 계정 사진-->
                                     <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile_img">
-                                    <p class="post_heder_head_username">{{post['user']}}</p>
+                                    <p class="post_heder_head_username">{{post[1]}}</p>
                                 </button>
                             </div>
-                            <!--TODO db 자신이 쓴 글만 한사람만 보이게-->
+                            {% if uid == post[1] %}
                             <div class="post_user_button">
                                 <button id="edit_button" class="user_button" title="수정하기">
                                     <span class="material-symbols-rounded">edit</span>
                                 </button> 
                                 <button id="delete_button" class="user_button" title="삭제하기">
                                     <span class="material-symbols-rounded">close</span>
-                                </button>  
+                                </button>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="post_content">
-                            <p style="margin-bottom: 0;margin-top: 5px;">{{post['content']}}</p>
+                            <p style="margin-bottom: 0;margin-top: 5px;">{{post[3]}}</p>
                         </div>
                         <div class="post_button_section">
                             <div class="reaction_button_section">
                                     <button class="response_button" id="favorite_button">
                                         <span class="material-symbols-rounded">favorite</span>
-                                        <span>{{post['favorite']}}</span>
+                                        <span>{{post[5]}}</span>
                                     </button>
                                     <button class="response_button" id="icon_circle_button">
                                         <span class="material-symbols-rounded">bookmark</span>
                                     </button>
-                                    <p class="post_heder_head_username">{{post['created']}}</p>
+                                    <p class="post_heder_head_username" style="color:rgb(210, 210, 210)">{{post[4]}}</p>
                             </div>
                             <button class="response_button" id="icon_circle_button">
                                 <span class="material-symbols-rounded">forum</span>
@@ -68,8 +82,15 @@
                         </div>
                 </div>
                 {%endfor%}
-
             </sction>
+
+            <footer class="footer">
+                <div style="display:flex;align-items: center;">
+                    <button class="big_circle_button ripple" id="like" onclick="addLikeClass(page_id)"><span class="material-symbols-rounded">kid_star</span></button>
+                    <button class="big_circle_button ripple"><span class="material-symbols-rounded">search</span></button>
+                    <button class="big_circle_button ripple" id="add"><span class="material-symbols-rounded">add</span></button>
+                </div>
+            </footer>
         </div>
     </body>
 </html>
