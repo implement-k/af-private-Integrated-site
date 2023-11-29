@@ -36,8 +36,8 @@
                         {% if postClass_likeList | length == 0 %}
                         <p>즐겨찾는 게시판을 추가하세요.</p>
                         {%else%}
-                        {%for cl in classLikeList%}
-                        <a href="/board/{{cl[0]}}" style="margin-top:10px;display:block;margin-bottom:0;">{{cl[1]}}</a>
+                        {%for cl in postClass_likeList%}
+                        <a href="/board/1&{{cl[0]}}&{{cl[1]}}" style="margin-top:10px;display:block;margin-bottom:0;">{{cl[1]}}</a>
                         {%endfor%}
                         {%endif%}
                     </div>
@@ -46,7 +46,7 @@
                     <h2 style="margin-top:0">모든 게시판</h2>
                     <div>
                         {%for pc in postClass_list%}
-                            <a href="/board/{{pc[0]}}" style="margin-top:10px;display:block;margin-bottom:0;">{{pc[1]}}</a>
+                            <a href="/board/1&{{pc[0]}}&{{pc[1]}}" style="margin-top:10px;display:block;margin-bottom:0;">{{pc[1]}}</a>
                         {%endfor%}
                     </div>
                 </div>

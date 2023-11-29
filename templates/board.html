@@ -15,7 +15,7 @@
                         <h1 class="header_nav_h1">병사 통합 홈페이지</h1>
                     </button>
                     <nav>
-                        <button class="element_round_button main_button label">{{post_name}}</button>
+                        <button class="element_round_button main_button label">{{class_info[1]}}</button>
                         <button class="element_round_button main_button">캘린더</button>
                         <button class="element_round_button main_button">친구관리</button>
                     </nav>
@@ -83,13 +83,13 @@
                 </div>
                 {%endfor%}
             </sction>
-
             <footer class="footer">
                 <div style="display:flex;align-items: center;">
-                    <button class="big_circle_button ripple" id="like" onclick="addLikeClass(page_id)"><span class="material-symbols-rounded">kid_star</span></button>
+                    <button class="big_circle_button ripple" id="like" onclick="addLikeClass({{page_id}},{{isLiked}})"><span class="material-symbols-rounded star">kid_star</span></button>
                     <button class="big_circle_button ripple"><span class="material-symbols-rounded">search</span></button>
-                    <button class="big_circle_button ripple" id="add"><span class="material-symbols-rounded">add</span></button>
+                    <button class="big_circle_button ripple" id="add" onclick="location.href='/board/0&{{class_info[0]}}&{{class_info[1]}}'"><span class="material-symbols-rounded">add</span></button>
                 </div>
+                <script>isLiked({{isLiked}})</script>
             </footer>
         </div>
     </body>
