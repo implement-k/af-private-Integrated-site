@@ -3,65 +3,46 @@
     <head>
         {% include "header.html"%}
         <title>공군 병사 통합 홈페이지</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <script src=" {{ url_for('static', filename='javascript/board.js') }}"></script>
-        <script src=" {{ url_for('static', filename='javascript/alert.js') }}"></script>
-        <link rel="stylesheet" href=" {{ url_for('static', filename='css/alert.css') }}"/>
+        <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script defer src=" {{ url_for('static', filename='javascript/write.js') }}"></script>
     </head>
-    <body>
-        <section class="modal modal-section type-confirm">
-            <div class="enroll_box">
-                <p class="menu_msg"></p>
+    <body class="main-section">
+        <header class="nav">
+            <div class="nav-main">
+                <button class="head-title" onclick="location.href='/'">
+                    <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                    <h1 class="main-title">병사 통합 홈페이지</h1>
+                </button>
+                <nav>
+                    <button class="middle-round --label">{{class_info[1]}}</button>
+                    <button class="middle-round --main">캘린더</button>
+                    <button class="middle-round --main">친구관리</button>
+                </nav>
             </div>
-            <div class="enroll_btn">
-                <button class="btn pink_btn btn_ok">확인</button>
-                <button class="btn gray_btn modal_close">취소</button>
-            </div>
-        </section>
-        <div class="top_section">
-            <header class="header">
-                <div class="header_nav">
-                    <button class="header_title" onclick="location.href='/'">
-                        <img src="{{ url_for('static', filename='image/af_logo.svg') }}" class="header_nav_aflogo">
-                        <h1 class="header_nav_h1">병사 통합 홈페이지</h1>
-                    </button>
-                    <nav>
-                        <button class="element_round_button main_button label">{{class_info[1]}}</button>
-                        <button class="element_round_button main_button">캘린더</button>
-                        <button class="element_round_button main_button">친구관리</button>
-                    </nav>
+            <div class="nav-main__profile-dropdown">
+                <button class="circle --dropdown">
+                    <img class="profile-img --big" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                </button>
+                <div class="profile-dropdown__list">
+                    <!-- TODO 회원 dropdown 메뉴  -->
+                    <button class="large-round --logout" onclick="location.href='/logout'">로그아웃</button>
                 </div>
-                {% if uid %}
-                    <div class="dropdown">
-                        <button class="profile dropbtn">
-                            <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
-                        </button>
-                        <div class="dropdown-content">
-                            <a href="#">Link 1</a>
-                            <a href="#">Link 2</a>
-                            <button class="element_round_button login_button" id="logout" onclick="location.href='/logout'">로그아웃</button>
-                        </div>
-                    </div>
-                {% else %}
-                    <button class="element_round_button main_login_button" onclick="location.href='/login'">로그인</button>
-                {% endif %}
-            </header>
-
-
-            <sction class="content_section">
-                <div style="height: 110px"></div>
-                <form method="post" autocomplete="off" name="post">
-                <h1 style="margin:50px 0 40px 0">글작성</h1>
-                <input type="text" class="write title" name="title" placeholder="제목을 입력해주세요"><br>
-                <textarea class="write content" name="content" placeholder="주의사항"></textarea>
+            </div>
+        </header>
+        <sction class="content">
+            <div style="height: 110px"></div>
+            <form method="post" autocomplete="off" name="post">
+                <h1 class="write-h1">글작성</h1>
+                <input type="text" class="write-text --title" name="title" placeholder="제목을 입력해주세요"><br>
+                <textarea class="write-text --content" placeholder="주의사항"></textarea>
                 <div>
                     <div>
-                        <button type="button" id="confirm">이전</button>
+                        <button>이전</button>
                         <button>게시물 쓰기</button>
+                        <!-- TODO 기능 추가  -->
                     </div>
                 </div>
-                </form>
-            </sction>
-        </div>
+            </form>
+        </sction>
     </body>
 </html>

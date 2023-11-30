@@ -1,75 +1,82 @@
-.element_round_button {
-    border: 0;
-    border-radius: 25px;
-    cursor:pointer;
+button{cursor:pointer;border:0;}
+
+.head-title{
+    display:flex;
+    align-items:center; 
+    justify-content:center;
+    background:rgb(28, 51, 91);
+    border-radius:25px;
+    margin-right:25px;
+    padding:0 30px 0 25px;
+    &.--login{width:100%;margin:0 0 20px 0;}
+    &.--signup{width:100%;margin:0 0 20px 0;flex-direction:column;}
 }
 
-.main_button{
-    height:50px;
-    width:120px;
-    margin:0 13px 0 0;
-    font-size:medium;
-    background-color: rgba(28,51,91,20%);
-    backdrop-filter: blur(10px);
-    transition: box-shadow .5s ease 0s;
-    &:hover {
-        box-shadow: 0 0 6px .1px rgba(28,51,91);
-    }
-}
-
-.label {
-    background-color: rgba(28,51,91,60%);
-}
-
-.main_login_button{
-    height:50px;
-    width:120px;
-    margin:0 13px 0 0;
-    font-size:medium;
+.small-round{
+    height: 22px;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    border:1px solid;
+    border-radius: 11px;
+    border-color:rgb(212, 212, 212);
+    padding:1px 10px 1px 1px;
     background-color: rgb(235, 235, 235);
-    transition: box-shadow .5s ease 0s;
-    &:hover {
-        box-shadow: 0 0 6px .1px rgb(175,175,175);
-    }
 }
 
-.login_button{
-    height:60px;
-    margin:20px 0 0 0;
-    font-size:medium;
-    border-radius: 25px;
-    transition: all .3s ease 0s;
-    &#signup{
-        width:120px;
-        background-color: rgb(235,235,235);
-        margin-right: 20px;
-    }
-    &#signin{
-        flex-grow: 1;
-        background-color: rgb(235,235,235);
-        cursor:auto;
-    }
-    &#logout{
-        width:100%;
-        background-color: rgb(224, 173, 173);
-        color: rgb(80, 15, 15);
-    }
-}
-
-.user_button {
+.small-round-response {
+    height:28px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: row;
+    border:1px solid;
+    border-radius: 14px;
+    border-color:rgb(212, 212, 212);
+    background-color: rgb(235, 235, 235);
+    margin-right: 4px;
+    &.--favorite {padding:0 8px 0 6px;}
+    &.--icon-circle{width: 28px;}
+    &.--signup-pw{
+        height:30px;
+        border-radius: 0 0 25px 25px;
+        font-size:small;
+        width:100%;
+        margin-bottom:20px;
+        &:focus{background-color:rgb(215, 219, 228);outline:0;}
+    }
+    &.--signup-id{
+        width:80px;
+        margin-bottom:20px;
+        transition:all .3s ease;
+        &:focus{background-color:rgb(215, 219, 228);outline:0;}
+        &:disabled{background-color:rgb(180, 225, 170);}
+    }
+    &>.material-symbols-rounded{
+        font-size:medium;
+        padding-top: 1px;
+    }
+}
+
+.small-round-border {
+    display:flex;
+    align-items:center;
+    justify-content:center;
     height:12px;
     width:12px;
-    border:0px;
     border-radius:6px;
     padding:1px;
-    margin-left: 6px;
-    transition: all .5s ease;
-    &:hover {
-        height: 22px;
-        width: 22px;
+    margin-left:6px;
+    transition:all .5s ease;
+    &.--edit{
+        background-color:rgb(235, 211, 162);  
+    }
+    &.--delete{
+        background-color:rgb(233, 158, 153);
+    }
+    &:hover{
+        height:22px;
+        width:22px;
         border-radius:11px;
         & span{
             font-size:medium;
@@ -83,93 +90,96 @@
     }
 }
 
-#edit_button {
-    background-color: rgb(235, 211, 162);
+.middle-round{
+    border-radius:25px;
+    height:50px;
+    margin:0 13px 0 0;
+    font-size:medium;
+    width:120px;
+    transition:box-shadow .4s ease 0s;
+    &.--main{
+        background-color:rgba(28,51,91,20%);
+        backdrop-filter:blur(10px);
+        &:hover{box-shadow: 0 0 6px .1px rgb(28,51,91);}
+    }
+    &.--label{
+        background-color: rgba(28,51,91,60%);
+        backdrop-filter:blur(10px);
+        &:hover{box-shadow: 0 0 6px .1px rgb(28,51,91);}
+    }
+    &.--login{
+        background-color:rgb(235, 235, 235);
+        &:hover{box-shadow:0 0 6px .1px rgb(175,175,175);}
+    }
+    
 }
 
-#delete_button {
-    background-color: rgb(233, 158, 153);
-}
-
-.response_button {
-    height:28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row;
-    border:1px solid;
-    border-radius: 14px;
-    border-color:rgb(212, 212, 212);
-    background-color: rgb(235, 235, 235);
-    margin-right: 4px;
-    &>.material-symbols-rounded{
-        font-size:medium;
-        padding-top: 1px;
+.large-round{
+    border-radius: 25px;
+    height:60px;
+    margin:20px 0 0 0;
+    font-size:medium;
+    transition: all .3s ease 0s;
+    &.--signup{
+        width:120px;
+        background-color: rgb(235,235,235);
+        margin-right: 20px;
     }
-    &#favorite_button {
-        padding:0 8px 0 6px;
+    &.--signin{
+        flex-grow: 1;
+        background-color: rgb(235,235,235);
+        cursor:auto;
     }
-    &#icon_circle_button{
-        width: 28px;
-    }
-}
-
-.signup_id {
-    border:0;
-    width:80px;
-    margin-bottom: 20px;
-    transition:all .3s ease;
-    &:focus{
-        background-color: rgb(215, 219, 228);
-        outline:0;
-    }
-    &:disabled{
-        background-color: rgb(180, 225, 170);
-    }
-}
-
-.signup_password {
-    height:30px;
-    border-radius: 0 0 25px 25px;
-    font-size:small;
-    border:0;
-    width:100%;
-    margin-bottom: 20px;
-    &:focus{
-        background-color: rgb(215, 219, 228);
-        outline:0;
+    &.--logout{
+        width:100%;
+        background-color: rgb(224, 173, 173);
+        color: rgb(80, 15, 15);
     }
 }
 
-.profile {
+.circle{
     height:50px;
     width:50px;
-    border:0;
     padding:0;
     border-radius:70%;
-}
-
-.big_circle_button {
-    display:flex;
-    align-items: center;
-    justify-content: center;
-    height:50px;
-    width:50px;
-    position: relative;
-    overflow: hidden;
-    -webkit-transition: background 400ms;
-    transition: background 400ms;
-    background-color: rgb(235,235,235);
-    outline: 0;
-    border: 0;
-    border-radius: 70%;
-    -webkit-box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
-    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    margin-left: 15px;
-    transition: width 0.4 ease;
-    &#add {
-        background-color: rgb(240,160,5);
+    &.--dropdown{
+        font-size:16px;
+        transition:box-shadow .3s ease 0s;
+        &:hover{box-shadow:0 0 6px .1px rgb(175,175,175);}
+    }
+    &.--board{
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        -webkit-transition: background 400ms;
+        transition: background 400ms;
+        background-color: rgb(235,235,235);
+        outline: 0;
+        -webkit-box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
+        box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
+        margin-left: 15px;
+        transition: width 0.4 ease;
+        &#add {background-color: rgb(240,160,5);}
+        background-position: center;
+        -webkit-transition: background 0.8s;
+        transition: background 0.8s;
+        &:hover {
+            background: rgb(202,206,214) radial-gradient(circle, transparent 1%, rgb(202,206,214) 1%) center/15000%;
+            &#add{
+                background: rgb(235, 194, 114) radial-gradient(circle, transparent 1%, rgb(235, 194, 114) 1%) center/15000%;
+            }
+        }
+        &:active{
+            background-color: rgb(28,51,91);
+            background-size: 100%;
+            -webkit-transition: background 0s;
+            transition: background 0s;
+            &#add{
+                background-color: rgb(240,160,5);
+            }
+        }
     }
 }
 
@@ -177,32 +187,8 @@
     display:flex;
     height:90px;
     width:90px;
-    border:0;
     border-radius: 10px;
     align-items: center;
     justify-content: center;
     background-color: rgb(28,51,92);
-    cursor:pointer;
-}
-
-
-.ripple {
-    background-position: center;
-    -webkit-transition: background 0.8s;
-    transition: background 0.8s;
-    &:hover {
-        background: rgb(202,206,214) radial-gradient(circle, transparent 1%, rgb(202,206,214) 1%) center/15000%;
-        &#add{
-            background: rgb(235, 194, 114) radial-gradient(circle, transparent 1%, rgb(235, 194, 114) 1%) center/15000%;
-        }
-    }
-    &:active{
-        background-color: rgb(28,51,91);
-        background-size: 100%;
-        -webkit-transition: background 0s;
-        transition: background 0s;
-        &#add{
-            background-color: rgb(240,160,5);
-        }
-    }
 }

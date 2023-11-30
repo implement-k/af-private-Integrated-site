@@ -4,62 +4,62 @@
         {% include "header.html"%}
         <title>공군 병사 통합 홈페이지</title>
     </head>
-    <body>
-        <div class="top_section">
-            <header class="header">
-                <div class="header_nav">
-                    <button class="header_title" onclick="location.href='/'">
-                        <img src="{{ url_for('static', filename='image/af_logo.svg') }}" class="header_nav_aflogo">
-                        <h1 class="header_nav_h1">병사 통합 홈페이지</h1>
-                    </button>
-                    <nav>
-                        <button class="element_round_button main_button">캘린더</button>
-                        <button class="element_round_button main_button">친구관리</button>
-                    </nav>
+    <body class="main-section">
+        <header class="nav">
+            <div class="nav-main">
+                <button class="head-title" onclick="location.href='/'">
+                    <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                    <h1 class="main-title">병사 통합 홈페이지</h1>
+                </button>
+                <nav>
+                    <button class="middle-round --main">캘린더</button>
+                    <button class="middle-round --main">친구관리</button>
+                </nav>
+            </div>
+            <div class="profile-dropdown">
+                <button class="circle--dropdown">
+                    <img class="profile-img --big" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                </button>
+                <div class="profile-dropdown__list">
+                    <!-- TODO 회원 dropdown 메뉴  -->
+                    <button class="large-round--logout" onclick="location.href='/logout'">로그아웃</button>
                 </div>
-                <div class="dropdown">
-                    <button class="profile dropbtn">
-                        <img src="{{url_for('static', filename='image/default_profile.jpg')}}" class="profile" style="overflow:hidden;">
-                    </button>
-                    <div class="dropdown-content">
-                        <a href="#">Link 1</a>
-                        <a href="#">Link 2</a>
-                        <button class="element_round_button login_button" id="logout" onclick="location.href='/logout'">로그아웃</button>
-                    </div>
-                </div>
-            </header>
-        <section class="home_content_section">
-            <div class="content_left">
-                <div class="board_list_card favorite">
-                    <h2 style="margin-top:0">즐겨찾기</h2>
+            </div>
+        </header>
+
+        <section class="home">
+            <div class="home_content --left">
+                <div class="board-list-card --like">
+                    <h2 class="margin-top-remove">즐겨찾기</h2>
                     <div>
-                        {% if postClass_likeList | length == 0 %}
+                        {% if liked_class_list | length == 0 %}
+                        <!-- TODO 꾸미기 -->
                         <p>즐겨찾는 게시판을 추가하세요.</p>
                         {%else%}
-                        {%for cl in postClass_likeList%}
-                        <a href="/board/1&{{cl[0]}}&{{cl[1]}}" style="margin-top:10px;display:block;margin-bottom:0;">{{cl[1]}}</a>
+                        {%for c in liked_class_list%}
+                        <a href="/board/1&{{c[0]}}&{{c[1]}}" style="margin-top:10px;display:block;margin-bottom:0;">{{c[1]}}</a>
                         {%endfor%}
                         {%endif%}
                     </div>
                 </div>
-                <div class="board_list_card">
-                    <h2 style="margin-top:0">모든 게시판</h2>
+                <div class="board-list-card --general">
+                    <h2 class="margin-top-remove">모든 게시판</h2>
                     <div>
-                        {%for pc in postClass_list%}
-                            <a href="/board/1&{{pc[0]}}&{{pc[1]}}" style="margin-top:10px;display:block;margin-bottom:0;">{{pc[1]}}</a>
+                        {%for c in class_list%}
+                            <a href="/board/1&{{c[0]}}&{{c[1]}}" style="margin-top:10px;display:block;margin-bottom:0;">{{c[1]}}</a>
                         {%endfor%}
                     </div>
                 </div>
             </div>
-            <div class="content_right">
+            <div class="home_content --right">
                 <div>
-
+                    <!-- TODO 캘린더 위젯 -->
                 </div>
-                <div class="board_list_card">
-                    <h2 style="margin-top:0">친구</h2>
+                <div class="board-list-card --general">
+                    <h2 class="margin-top-remove">친구</h2>
+                    <!-- TODO 친구 -->
                 </div>
             </div>
         </section>
-        </div>
     </body>
 </html>

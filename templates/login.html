@@ -6,22 +6,21 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script src=" {{ url_for('static', filename='javascript/login.js') }}"></script>
     </head>
-    <body class="login_body">
-        <div class="login_main">
-            <button class="header_title login_title" onclick="location.href='/'">
-                <img src="{{ url_for('static', filename='image/af_logo.svg') }}" class="header_nav_aflogo">
-                <h1 class="header_nav_h1">병사 통합 홈페이지</h1>
+    <body class="login-body">
+        <section class="login-main">
+            <button class="head-title --login" onclick="location.href='/'">
+                <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                <h1 class="main-title">병사 통합 홈페이지</h1>
             </button>
-            <form class="login_form" method="post">
-                <input type="text" id="id" name="id" placeholder="아이디" style="border-radius: 25px 25px 0 0;">
-                <input class="signup_input_3" type="password" id="password" name="password" placeholder="비밀번호">
-                <script>paint_login_button()</script>
-                <script>prevent_signin_enter()</script>
+            <form method="post">
+                <input class="login-form_input --id" type="text" id="id" name="id" placeholder="아이디" style="border-radius: 25px 25px 0 0;">
+                <input class="login-form_input --pw" type="password" id="password" name="password" placeholder="비밀번호">
+                <script>paint_login_button();prevent_signin_enter()</script>
                 <div style="display: flex;">
-                    <button type="button" class="element_round_button login_button" id="signup" onclick="location.href='/signup/'">회원가입</button>
-                    <button class="element_round_button login_button" id="signin" onclick="location.href='/isUser'" disabled>로그인</button>
+                    <button type="button" class="large-round --signup" id="signup" onclick="location.href='/signup/'">회원가입</button>
+                    <button class="large-round --signin" id="signin" onclick="location.href='/isUser'" disabled>로그인</button>
                 </div>
             </form>
-        </div>
+        </section>
     </body>
 </html>
