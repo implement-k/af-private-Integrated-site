@@ -2,6 +2,7 @@
 <html>
     <head>
         {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
         <title>공군 병사 통합 홈페이지</title>
         <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script defer src=" {{ url_for('static', filename='javascript/board.js') }}"></script>
@@ -14,21 +15,21 @@
                     <h1 class="main-title">병사 통합 홈페이지</h1>
                 </button>
                 <nav>
-                    <button class="middle-round --label">{{class_info[1]}}</button>
-                    <button class="middle-round --main">캘린더</button>
-                    <button class="middle-round --main">친구관리</button>
+                    <div class="nav-main__dropdown">
+                        <button class="middle-round --label">{{class_info[1]}}</button>
+                        <div class="dropdown__list">
+                            <div style="height:15px;"></div>
+                            <div class="dropdown__list_content --class-intro">
+                                <p>asdfasdfasdf</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="middle-round --main" onclick="location.href='/calender'">캘린더</button>
+                    <button class="middle-round --main" onclick="location.href='/friend/management'">친구관리</button>
                 </nav>
             </div>
-            {% if uid %}
-                <div class="nav-main__profile-dropdown">
-                    <button class="circle --dropdown">
-                        <img class="profile-img --big" src="{{url_for('static', filename='image/default_profile.jpg')}}">
-                    </button>
-                    <div class="profile-dropdown__list">
-                        <!-- TODO 회원 dropdown 메뉴  -->
-                        <button class="large-round --logout" onclick="location.href='/logout'">로그아웃</button>
-                    </div>
-                </div>
+            {% if user_info[0] %}
+            {% include "dropdown.html" %}
             {% else %}
                 <button class="middle-round --login" onclick="location.href='/login'">로그인</button>
             {% endif %}

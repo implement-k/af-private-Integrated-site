@@ -2,9 +2,10 @@
 <html>
     <head>
         {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/login.css') }}"/>
         <title>공군 병사 통합 홈페이지-회원가입</title>
-        <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <script defer src=" {{ url_for('static', filename='javascript/login.js') }}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src=" {{ url_for('static', filename='javascript/signup.js') }}"></script>
     </head>
     <body class="login-body">
         <div class="login-main">
@@ -15,8 +16,7 @@
             <form class="signup-form" method="post">
                 <div class="signup-text" style="margin-bottom:5px;">
                     <div class="signup-text_label --general"><p>아이디</p></div>
-                    <input class="login-form_input --1" type="text" id="id" name="id" placeholder="" oninput="">
-                    <script>paint_id_original()</script>
+                    <input class="login-form_input --1" type="text" id="id" name="id" placeholder="" oninput="paint_id_original()">
                 </div>
                 <button type="button" class="small-round-response --signup-id" id="id_dub" onclick="is_id_dub();" style="border:0">중복 확인</button>
                 <div class="signup-text">
@@ -32,8 +32,8 @@
                     <div class="signup-text_label --general"><p>전화번호</p></div>
                     <input class="login-form_input --1" type="text" id="num" name="num" oninput="autoHyphen(this)">
                 </div>
-                <script>paint_signup_button();prevent_signup_enter()</script>
-                <button class="large-round --signin" disabled>회원가입</button>
+                <script>prevent_signup_enter();paint_signup_button()</script>
+                <button class="large-round --signin" id="signup" disabled>회원가입</button>
             </form>
         </div>
     </body>

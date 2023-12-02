@@ -2,47 +2,50 @@
 <html>
     <head>
         {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
         <title>공군 병사 통합 홈페이지</title>
         <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script defer src=" {{ url_for('static', filename='javascript/write.js') }}"></script>
     </head>
-    <body class="main-section">
-        <header class="nav">
-            <div class="nav-main">
-                <button class="head-title" onclick="location.href='/'">
-                    <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
-                    <h1 class="main-title">병사 통합 홈페이지</h1>
-                </button>
-                <nav>
-                    <button class="middle-round --label">{{class_info[1]}}</button>
-                    <button class="middle-round --main">캘린더</button>
-                    <button class="middle-round --main">친구관리</button>
-                </nav>
-            </div>
-            <div class="nav-main__profile-dropdown">
-                <button class="circle --dropdown">
-                    <img class="profile-img --big" src="{{url_for('static', filename='image/default_profile.jpg')}}">
-                </button>
-                <div class="profile-dropdown__list">
-                    <!-- TODO 회원 dropdown 메뉴  -->
-                    <button class="large-round --logout" onclick="location.href='/logout'">로그아웃</button>
+    <body style="position:relative">
+        <section class="modal">
+            <span class="material-symbols-rounded" style="font-size:40px">error</span>
+            <p class="modal-p">글 작성을 중지하시겠습니까?</p>
+            <button class="middle-round --login" onclick="closeModal()">아니요</button>
+            <button class="middle-round --yes" onclick="goPage('{{class_info[0]}}','{{class_info[1]}}')">예</button>
+        </section>
+        <div class="main-section">
+            <header class="nav">
+                <div class="nav-main">
+                    <button class="head-title" onclick="showModal('/')">
+                        <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                        <h1 class="main-title">병사 통합 홈페이지</h1>
+                    </button>
+                    <nav>
+                        <button class="middle-round --label" id="class_name">{{class_info[1]}}</button>
+                        <button class="middle-round --main" onclick="showModal('/calender')">캘린더</button>
+                        <button class="middle-round --main" onclick="showModal('/friend/management')">친구관리</button>
+                    </nav>
                 </div>
-            </div>
-        </header>
-        <sction class="content">
-            <div style="height: 110px"></div>
-            <form method="post" autocomplete="off" name="post">
-                <h1 class="write-h1">글작성</h1>
-                <input type="text" class="write-text --title" name="title" placeholder="제목을 입력해주세요"><br>
-                <textarea class="write-text --content" placeholder="주의사항"></textarea>
-                <div>
-                    <div>
-                        <button>이전</button>
-                        <button>게시물 쓰기</button>
-                        <!-- TODO 기능 추가  -->
-                    </div>
+                {% if user_info[0] %}
+                {% include "dropdown.html" %}
+                {% else %}
+                    <button class="middle-round --login" onclick="showModal('/login')">로그인</button>
+                {% endif %}
+            </header>
+            <sction class="content">
+                <div style="height: 110px"></div>
+                    <h1 class="write-h1">글작성</h1>
+                    <input type="text" class="write-text --title" id="title" placeholder="제목을 입력해주세요"><br>
+                    <textarea class="write-text --content" id="content" placeholder="주의사항&#13"></textarea>
+                    <div class="main-section">
+                        <div>
+                            <button type="button" class="large-round --back" onclick="showModal('back')">이전</button>
+                            <button type="button" class="large-round --write" onclick="showModal('create')">게시물 쓰기</button>
+                        </div>
                 </div>
-            </form>
-        </sction>
+            </sction>
+        </div>
+        <div class="dimlayer"></div>
     </body>
 </html>

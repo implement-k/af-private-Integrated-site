@@ -9,6 +9,7 @@ app.secret_key = uuid.uuid4().hex
 def db(isOutput, sql):
     con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
     cur = con.cursor()
+
     if isOutput:
         output = []
         for i in sql:
@@ -39,25 +40,27 @@ def login():
         if isUser > 0:
             session['id'] = user_id
 
-            cur.execute("SELECT u_clike1,u_clike2,u_clike3 FROM user WHERE u_id = '{0}'".format(user_id))
-            classLike_list = cur.fetchall()[0]
+            cur.execute("SELECT u_clike1,u_clike2,u_clike3,u_intro FROM user WHERE u_id = '{0}'".format(user_id))
+            db_result = cur.fetchall()[0]
 
-            for i in range(3): session[str(i+1)] = classLike_list[i]
+            for i in range(3): session[str(i+1)] = db_result[i]
+            session['user_intro'] = db_result[3]
 
             con.close()
             return redirect('/')
         else:
             con.close()
-            return render_template('login.html')
+            return render_template('login.html',isCorrect = 0)
     else:
         if "id" in session: return redirect('/')
-        else: return render_template('login.html')
+        else: return render_template('login.html',isCorrect = 1)
 
 
 @app.route('/logout/')
 def logout():
     if "id" in session:
         session.pop('id',None)
+        session.pop('user_intro',None)
 
         for i in range(3): session.pop(str(i+1), None)
 
@@ -71,7 +74,7 @@ def signup():
             user_id = request.form.get('id')
             user_pw = request.form.get('pw_dub')
             user_phoneNumber = request.form.get('num').replace("-", "")
-            valid_id = '^[A-Za-z0-9._]{1,20}$'
+            valid_id = '^[가-힣A-Za-z0-9._]{1,20}$'
             valid_pw = '^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,25}$'
 
             if not re.fullmatch(valid_id, user_id) or not re.fullmatch(valid_pw, user_pw): return '잘못된 접근'
@@ -86,13 +89,15 @@ def signup():
 
 @app.route('/board/<int:isShow>&<int:class_id>&<class_name>',methods=['POST', 'GET'])
 def board(isShow, class_id, class_name):    #isShow 1: 글보기, isShow 0: 글작성
-    user_id = session.get('id', None)
+    user_id = session.get('id', None)       #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
+    if not user_id and class_id != 1: return redirect('/login')
     class_info = [class_id, class_name]     #index 0: class id, index 1: class name
-
+    user_intro = session.get('user_intro', None)
+    if not user_intro: user_intro="자기소개가 없습니다."
+    user_info = [user_id, user_intro]
+    
     if isShow == 1:
-        isLiked = [0 for i in range(100)]
-
-        if not user_id and class_id != 1: return redirect('/login')     #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
+        isLiked = [0 for i in range(100)]  
 
         post_list = db(True, ["SELECT * FROM posts WHERE p_classification = {0}".format(class_id)])[0]
         
@@ -106,15 +111,19 @@ def board(isShow, class_id, class_name):    #isShow 1: 글보기, isShow 0: 글�
             isLike = 1
         #TODO end 좋아요 눌렀는지 확인 => 
 
-        return render_template('board.html', post_list=post_list, uid=user_id, class_info=class_info, isLiked=isLike)
+        return render_template('board.html', post_list=post_list, user_info=user_info, class_info=class_info, isLiked=isLike)
     elif isShow == 0:
         if not user_id and class_id != 1: return redirect('/login')
-        else: return render_template('write.html', class_info = class_info)
+        else: return render_template('write.html', class_info=class_info, user_info=user_info)
 
 
 @app.route('/',methods=['POST', 'GET'])
 def home():
-    if "id" in session:
+    user_id = session.get('id', None)
+    if user_id:
+        user_intro = session.get('user_intro', None)
+        if not user_intro: user_intro="자기소개가 없습니다."
+        user_info = [user_id, user_intro]
         liked_class_list = []
                 
         class_list = db(True, ["SELECT * FROM post_class"])[0]
@@ -126,9 +135,38 @@ def home():
                     liked_class_list.append([class_id, c[1]])
                     break
             
-        return render_template('home.html', class_list=class_list, liked_class_list=liked_class_list)
+        return render_template('home.html', class_list=class_list, liked_class_list=liked_class_list, user_info=user_info)
     else:
         return redirect('/board/1&1&계룡대')
+
+
+@app.route('/friend/management')
+def manageFriend():
+    return render_template('friend_management.html')
+
+
+@app.route('/calender')
+def calender():
+    return render_template('calender.html')
+
+
+@app.route('/user')
+def user():
+    return render_template('user.html')
+
+
+@app.route('/saved/<int:isWrite>')      #isWrite 0: 저장한 게시물, isWrite 1: 내가쓴 글
+def savedPost(isWrite):
+    return render_template('save_post.html')
+
+
+@app.route('/createPost/<int:class_id>', methods=['POST']) 
+def createPost(class_id):
+    user_id = session.get('id', None)
+    title = request.form.get('title')
+    content = request.form.get('content')
+    db(False, ["INSERT INTO posts(p_uid,p_title,p_content,p_created,p_classification) VALUES('{0}','{1}','{2}',Now(),{3})".format(user_id, title, content, class_id)])
+    return '1'
 
 
 #TODO 좋아요 누르는 쿼리 다시 짜기
@@ -172,9 +210,9 @@ def dubCheck():
     try:
         name = request.form['name']
         value = request.form['value']
-        return str(len(db(True, ["SELECT {0} FROM user WHERE {0}='{1}'".format(name, value)]))[0]) #중복이면 1, 중복 아니면 0
+        return str(len(db(True, ["SELECT {0} FROM user WHERE {0}='{1}'".format(name, value)])[0])) #중복이면 1, 중복 아니면 0
     except Exception as e:
-        return "error"
+        return 'error'
 
 
 app.run(debug=True)

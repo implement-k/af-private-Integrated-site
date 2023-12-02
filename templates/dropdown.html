@@ -1,0 +1,17 @@
+<div class="nav-main__dropdown">
+    <button class="circle --dropdown">
+        <img class="profile-img --big" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+    </button>
+    <div class="dropdown__list --profile">
+        <div style="height:10px;"></div>
+        <div class="dropdown__list_content --profile">
+            <button class="board-list-card --user" onclick="location.href='/user'">
+                <h1 style="margin-top:10px;margin-bottom:6px">{{user_info[0]}}</h1>
+                <p class="margin-top-remove">{{user_info[1]}}</p>
+            </button>
+            <a href="/saved/0">저장한 글</a><br>
+            <a class="a-margin-top-add" href="/saved/1">내가 작성한 글</a>
+            <button class="large-round --logout" onclick="location.href='/logout'">로그아웃</button>
+        </div>
+    </div>
+</div>

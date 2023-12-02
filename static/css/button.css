@@ -105,13 +105,18 @@ button{cursor:pointer;border:0;}
     &.--label{
         background-color: rgba(28,51,91,60%);
         backdrop-filter:blur(10px);
+        cursor:auto;
         &:hover{box-shadow: 0 0 6px .1px rgb(28,51,91);}
     }
     &.--login{
         background-color:rgb(235, 235, 235);
         &:hover{box-shadow:0 0 6px .1px rgb(175,175,175);}
     }
-    
+    &.--yes{
+        background-color:rgb(235, 235, 235);
+        margin:0;
+        &:hover{box-shadow:0 0 6px .1px rgb(175,175,175);}
+    }
 }
 
 .large-round{
@@ -134,6 +139,17 @@ button{cursor:pointer;border:0;}
         width:100%;
         background-color: rgb(224, 173, 173);
         color: rgb(80, 15, 15);
+    }
+    &.--back{
+        width:120px;
+        margin-right: 10px;
+        background-color:rgb(235, 235, 235);
+        &:hover{box-shadow:0 0 6px .1px rgb(175,175,175);}
+    }
+    &.--write{
+        width:160px;
+        background-color:rgb(240, 160, 5);
+        &:hover{box-shadow:0 0 6px .1px rgb(175,175,175);}
     }
 }
 
