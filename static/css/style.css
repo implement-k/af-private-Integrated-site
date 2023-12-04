@@ -2,13 +2,15 @@
 textarea, h1, p, button, span, input, div{font-family:'Noto Sans KR', sans-serif;}
 a{text-decoration-line:none;color:black;}
 .margin-top-remove{margin-top:0}
-.margin-top-add{margin:0 10px 0 0;}
+.margin-top-add{margin:0 10px 0 0;word-wrap:break-word;}
 .a-margin-top-add{margin-top:10px;display:block;margin-bottom:0;}
 .small-font{font-weight:200;margin:0;font-size: small;&.--date{color:rgb(210, 210, 210);}}
 .star{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' -25,'opsz' 24}
 .write-h1{margin:50px 0 40px 0}
 .main-title{margin:0;height:50px;font-size:large;font-weight:700;padding-top:20px;color:rgb(245,245,245);}
 .modal-p{font-size:large;margin:6px 0 20px 6px;}
+.content-p{margin-bottom:0;margin-top:10px;word-wrap:break-word;}
+.class_info-p{margin:0;font-size:large}
 
 /* default setting */
 body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
@@ -40,6 +42,10 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
 .profile-img{
     border-radius:70%;
     overflow:hidden;
+    &.--xlarge{
+        height:100px;
+        width:100px;
+    }
     &.--big{
         height:50px;
         width:50px;
@@ -60,9 +66,11 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
     border-radius:25px;
     padding:20px;
     margin-bottom:20px;
+    background-color:rgb(235, 235, 235);
     &.--like{background-color:rgb(215, 219, 228);}
-    &.--general{background-color:rgb(235, 235, 235);}
-    &.--user{background-color:rgb(235, 235, 235);text-align:left;}
+    &.--user{text-align:left;}
+    &.--private{flex:1;min-width:300px;margin-right: 20px;}
+    &.--no-padding{padding:0}
 }
 
 /* home*/
@@ -178,13 +186,13 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
 }
 
 .dropdown__list_content{
-    background-color:rgba(255,255,255,20%);
+    background-color:rgba(255,255,255,40%);
     backdrop-filter:blur(5px);
     padding:20px 20px 20px 20px;
     box-shadow:0 0 6px .1px rgb(175,175,175);
     height:auto;
     &.--profile{border-radius:37px;}
-    &.--class-intro{border-radius:25px;}
+    &.--class-intro{border-radius:25px;width:355px}
 }
 
 /* modal */

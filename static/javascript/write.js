@@ -2,37 +2,47 @@ var page = '';
 
 const showModal = (link) => {
     page = link;
-    $('.modal').css("visibility","visible");
+    $('#yn').css("visibility","visible");
     $('.dimlayer').css("visibility","visible");
     if (page === 'create') {$('.modal-p').text("글을 올리겠습니까?");}
 };
 
 const closeModal = () => {
     page = '';
-    $('.modal').css("visibility","hidden");
+    $('#yn').css("visibility","hidden");
     $('.dimlayer').css("visibility","hidden");
 };
 
-const go = (class_id, class_name) => {
-    alert(class_id)
-    alert(class_name)
+const closeCancelModal = () => {
+    $('#cancel').css("visibility","hidden");
+    $('.dimlayer').css("visibility","hidden");
 }
 
 const goPage = (class_id, class_name) => {
+    var title = $('#title').val();
+    var content = $('#content').val();
     if (page === 'back') {history.back();}
     else if (page === 'create') {
-        var title = $('#title').val();
-        var content = $('#content').val();
-        createLink = '/createPost/'+class_id;
+        $('#yn').css("visibility","hidden");
+        $('.dimlayer').css("visibility","hidden");
         if (title.length === 0) {
-            $('#title').attr("placeholder","제목을 입력하세요.");
-            $('.modal').css("visibility","hidden");
-            $('.dimlayer').css("visibility","hidden");  
+            $('.modal-p').text("제목을 입력해주세요.");
+            $('#cancel').css("visibility","visible");
+            $('.dimlayer').css("visibility","visible"); 
         } else if (content.length === 0) {
-            $('#content').attr("placeholder","내용을 입력하세요.");
-            $('.modal').css("visibility","hidden");
-            $('.dimlayer').css("visibility","hidden");
+            $('.modal-p').text("내용을 입력해주세요.");
+            $('#cancel').css("visibility","visible");
+            $('.dimlayer').css("visibility","visible");
+        } else if (title.length > 45) {
+            $('.modal-p').text("제목은 45자 이내로 작성해 주세요");
+            $('#cancel').css("visibility","visible");
+            $('.dimlayer').css("visibility","visible");
+        } else if (content.length > 400) {
+            $('.modal-p').text("내용은 400자 이내로 작성해 주세요");
+            $('#cancel').css("visibility","visible");
+            $('.dimlayer').css("visibility","visible");
         } else {
+            createLink = '/createPost/'+class_id;
             const specialChars = /['"\\%_]/g;
             const escapeChars = {"'": "\\'",'"': '\\"','\\': '\\\\','%': '\\%','_': '\\_'};
             
@@ -54,6 +64,6 @@ const goPage = (class_id, class_name) => {
 };
 
 const createPost = () => {
-    $('.modal').css("visibility","visible");
+    $('#yn').css("visibility","visible");
     $('.dimlayer').css("visibility","visible");
 }

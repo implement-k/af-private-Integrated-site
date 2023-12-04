@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
+        <title>{{user_info[0]}}</title>
+    </head>
+    <body class="main-section">
+        <header class="nav">
+            <div class="nav-main">
+                <button class="head-title" onclick="location.href='/'">
+                    <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                    <h1 class="main-title">병사 통합 홈페이지</h1>
+                </button>
+                <nav>
+                    <button class="middle-round --main" onclick="history.back()">이전으로</button>
+                </nav>
+            </div>
+        </header>
+        <section class="content">
+            <div style="height: 110px"></div>
+            <div>
+                <img class="profile-img --xlarge" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                <h1>{{user_info[0]}}</h1>
+                <div>
+                    <p>{{user_info[1]}}</p>
+                    <button>자기소개 수정</button>
+                </div>  
+            </div>
+            <div class="main-section" style="flex-wrap:wrap">
+                <div class="board-list-card --private">
+                    <h1>친구</h1>
+                    {%if friend_list | length == 0%}
+                    <p>친구가 없습니다.</p>
+                    {%else%}
+                    {%for friend in friend_list%}
+                    <p>{{friend}}</p>
+                    {%endfor%}
+                    {%endif%}
+                </div>
+                <div class="board-list-card --private">
+                    <h1>친구 요청</h1>
+                    {%if friend_request_list | length == 0%}
+                    <p>친구 요청이 없습니다.</p>
+                    {%else%}
+                    {%for friend_request in friend_request_list%}
+                    <p>{{friend_request}}</p>
+                    {%endfor%}
+                    {%endif%}
+                </div>
+                <div class="board-list-card --private">
+                    <h1>내가 쓴 글</h1>
+                </div>
+                <div class="board-list-card --private">
+                    <h1>내가 저장한 글</h1>
+                </div>
+            </div>
+        </section>
+        
+    </body>
+</html>

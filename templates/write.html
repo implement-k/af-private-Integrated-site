@@ -8,11 +8,16 @@
         <script defer src=" {{ url_for('static', filename='javascript/write.js') }}"></script>
     </head>
     <body style="position:relative">
-        <section class="modal">
+        <section class="modal" id="yn">
             <span class="material-symbols-rounded" style="font-size:40px">error</span>
             <p class="modal-p">글 작성을 중지하시겠습니까?</p>
             <button class="middle-round --login" onclick="closeModal()">아니요</button>
             <button class="middle-round --yes" onclick="goPage('{{class_info[0]}}','{{class_info[1]}}')">예</button>
+        </section>
+        <section class="modal" id="cancel">
+            <span class="material-symbols-rounded" style="font-size:40px">error</span>
+            <p class="modal-p"></p>
+            <button class="middle-round --full" onclick="closeCancelModal()">닫기</button>
         </section>
         <div class="main-section">
             <header class="nav">
@@ -27,11 +32,7 @@
                         <button class="middle-round --main" onclick="showModal('/friend/management')">친구관리</button>
                     </nav>
                 </div>
-                {% if user_info[0] %}
                 {% include "dropdown.html" %}
-                {% else %}
-                    <button class="middle-round --login" onclick="showModal('/login')">로그인</button>
-                {% endif %}
             </header>
             <sction class="content">
                 <div style="height: 110px"></div>

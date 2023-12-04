@@ -4,8 +4,8 @@
         {% include "header.html"%}
         <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
         <title>공군 병사 통합 홈페이지</title>
-        <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <script defer src=" {{ url_for('static', filename='javascript/board.js') }}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src=" {{ url_for('static', filename='javascript/board.js') }}"></script>
     </head>
     <body class="main-section">
         <header class="nav">
@@ -20,7 +20,7 @@
                         <div class="dropdown__list">
                             <div style="height:15px;"></div>
                             <div class="dropdown__list_content --class-intro">
-                                <p>asdfasdfasdf</p>
+                                <p class="class_info-p">{{class_info[2]}}</p>
                             </div>
                         </div>
                     </div>
@@ -47,14 +47,14 @@
                             <p class="small-font">{{post[1]}}</p>
                         </button>
                     </div>
-                    {% if uid == post[1] %}
+                    {% if user_info[0] == post[1] %}
                     <div class="post-card_action">
                         <button class="small-round-border --edit" title="수정하기"><span class="material-symbols-rounded">edit</span></button> 
                         <button class="small-round-border --delete" title="삭제하기"><span class="material-symbols-rounded">close</span></button>
                     </div>
                     {% endif %}
                 </div>
-                <p style="margin-bottom: 0;margin-top: 5px;">{{post[3]}}</p>
+                <p class="content-p">{{post[3]}}</p>
                 <div class="post-card_action --bottom">
                     <div class="post-card_action">
                             <button class="small-round-response --favorite">
@@ -74,11 +74,11 @@
         </section>
         <footer class="post-function --section">
             <div class="post-function">
-                <button class="circle --board" id="class_like" onclick="addLikeClass({{page_id}},{{isLiked}})"><span class="material-symbols-rounded star">kid_star</span></button>
+                <button class="circle --board" id="class_like" onclick="addLikeClass('{{class_info[0]}}','{{isLiked}}')"><span class="material-symbols-rounded star" id="star">kid_star</span></button>
                 <button class="circle --board"><span class="material-symbols-rounded">search</span></button>
                 <button class="circle --board" id="add" onclick="location.href='/board/0&{{class_info[0]}}&{{class_info[1]}}'"><span class="material-symbols-rounded">add</span></button>
             </div>
-            <script>isLiked({{isLiked}})</script>
+            <script>isLiked('{{isLiked}}')</script>
         </footer>
     </body>
 </html>

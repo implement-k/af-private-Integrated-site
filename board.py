@@ -32,7 +32,7 @@ def login():
         user_id = request.form.get('id')
         user_pw = request.form.get('password')
 
-        if len(user_id) == 0 or len(user_pw) == 0: return redirect('/login')
+        if len(user_id) == 0 or len(user_pw) == 0: return redirect('/login',isCorrect=0)
         
         cur.execute("SELECT u_id FROM user WHERE u_id = '{0}' AND u_pw = '{1}';".format(user_id, user_pw))
         isUser = len(cur.fetchall())
@@ -40,20 +40,17 @@ def login():
         if isUser > 0:
             session['id'] = user_id
 
-            cur.execute("SELECT u_clike1,u_clike2,u_clike3,u_intro FROM user WHERE u_id = '{0}'".format(user_id))
-            db_result = cur.fetchall()[0]
-
-            for i in range(3): session[str(i+1)] = db_result[i]
-            session['user_intro'] = db_result[3]
+            cur.execute("SELECT u_intro FROM user WHERE u_id = '{0}'".format(user_id))
+            session['user_intro'] = cur.fetchall()[0][0]
 
             con.close()
             return redirect('/')
         else:
             con.close()
-            return render_template('login.html',isCorrect = 0)
+            return render_template('login.html',isCorrect=0)
     else:
         if "id" in session: return redirect('/')
-        else: return render_template('login.html',isCorrect = 1)
+        else: return render_template('login.html',isCorrect=1)
 
 
 @app.route('/logout/')
@@ -61,9 +58,6 @@ def logout():
     if "id" in session:
         session.pop('id',None)
         session.pop('user_intro',None)
-
-        for i in range(3): session.pop(str(i+1), None)
-
     return redirect('/')
 
 
@@ -87,34 +81,35 @@ def signup():
         else: return render_template('signup.html')
         
 
-@app.route('/board/<int:isShow>&<int:class_id>&<class_name>',methods=['POST', 'GET'])
-def board(isShow, class_id, class_name):    #isShow 1: 글보기, isShow 0: 글작성
+@app.route('/board/<int:mode>&<int:class_id>&<class_name>',methods=['POST', 'GET'])
+def board(mode, class_id, class_name):    #mode 1: 글보기, mode 0: 글작성, mode 2,3 저장한 게시물, 내가쓴글
     user_id = session.get('id', None)       #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
     if not user_id and class_id != 1: return redirect('/login')
-    class_info = [class_id, class_name]     #index 0: class id, index 1: class name
+
     user_intro = session.get('user_intro', None)
     if not user_intro: user_intro="자기소개가 없습니다."
+
     user_info = [user_id, user_intro]
     
-    if isShow == 1:
-        isLiked = [0 for i in range(100)]  
+    if mode == 1:
+        sql = ["SELECT * FROM posts WHERE p_classification = {0}".format(class_id),
+        "SELECT c_intro FROM post_class WHERE c_id={0}".format(class_id),
+        "SELECT l_id FROM liked_class WHERE l_uid='{0}' and l_cid={1}".format(user_id, class_id)]
 
-        post_list = db(True, ["SELECT * FROM posts WHERE p_classification = {0}".format(class_id)])[0]
+        result = db(True, sql)
+        post_list = result[0]
+        class_info = [class_id, class_name, result[1][0][0]]     #index 0: class id, index 1: class name, index 2:class intro
         
-        #TODO start 좋아요 눌렀는지 확인 => 
-        isLike = 0
-        for i in range(3):
-            cid = session.get(str(i+1), None)
-            if cid != 0 and cid != None: isLiked[cid-1] = 1
+        isLiked = 0
+        if len(result[2]) != 0: isLiked = 1
 
-        if isLiked[class_id-1] == 1:
-            isLike = 1
-        #TODO end 좋아요 눌렀는지 확인 => 
-
-        return render_template('board.html', post_list=post_list, user_info=user_info, class_info=class_info, isLiked=isLike)
-    elif isShow == 0:
-        if not user_id and class_id != 1: return redirect('/login')
-        else: return render_template('write.html', class_info=class_info, user_info=user_info)
+        return render_template('board.html', post_list=post_list, user_info=user_info, class_info=class_info, isLiked=isLiked)
+    elif mode == 0:
+        if not user_id: return redirect('/login')
+        else: 
+            result = db(True, ["SELECT c_intro FROM post_class WHERE c_id={0}".format(class_id)])[0]
+            class_info = [class_id, class_name, result[0][0]]     #index 0: class id, index 1: class name, index 2:class intro
+            return render_template('write.html', class_info=class_info, user_info=user_info)
 
 
 @app.route('/',methods=['POST', 'GET'])
@@ -124,16 +119,10 @@ def home():
         user_intro = session.get('user_intro', None)
         if not user_intro: user_intro="자기소개가 없습니다."
         user_info = [user_id, user_intro]
-        liked_class_list = []
                 
-        class_list = db(True, ["SELECT * FROM post_class"])[0]
-
-        for i in range(3):
-            class_id = session.get(str(i+1), None)
-            for c in class_list:
-                if class_id == c[0]:
-                    liked_class_list.append([class_id, c[1]])
-                    break
+        result = db(True, ["SELECT * FROM post_class","SELECT l_cid, c_name FROM liked_class, post_class WHERE liked_class.l_cid = post_class.c_id and l_uid='{0}'".format(user_id)])
+        class_list = result[0]
+        liked_class_list = result[1]
             
         return render_template('home.html', class_list=class_list, liked_class_list=liked_class_list, user_info=user_info)
     else:
@@ -147,17 +136,28 @@ def manageFriend():
 
 @app.route('/calender')
 def calender():
-    return render_template('calender.html')
+    user_id = session.get('id', None)       #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
+    if not user_id: return redirect('/login')
+    user_intro = session.get('user_intro', None)
+    if not user_intro: user_intro="자기소개가 없습니다."
+    user_info = [user_id, user_intro]
+    return render_template('calender.html', user_info=user_info)
 
 
 @app.route('/user')
-def user():
-    return render_template('user.html')
-
-
-@app.route('/saved/<int:isWrite>')      #isWrite 0: 저장한 게시물, isWrite 1: 내가쓴 글
-def savedPost(isWrite):
-    return render_template('save_post.html')
+def privateUser():
+    user_id = session.get('id', None)
+    if user_id:
+        user_intro = session.get('user_intro', None)
+        if not user_intro: user_intro="자기소개가 없습니다."
+        user_info = [user_id, user_intro]
+        # 미리 보기 5개까지만
+        friend_list=['asd','dfff','df']
+        # friend_list=[]
+        friend_request_list=['fff','12user','fkuser']
+        # friend_request_list=[]
+        return render_template('user.html', user_info=user_info, friend_list=friend_list, friend_request_list=friend_request_list)
+    else: return redirect('/login')
 
 
 @app.route('/createPost/<int:class_id>', methods=['POST']) 
@@ -169,40 +169,30 @@ def createPost(class_id):
     return '1'
 
 
-#TODO 좋아요 누르는 쿼리 다시 짜기
 @app.route('/likeClass/<int:isAdd>',methods=['POST'])
 def likeClass(isAdd):
-    if isAdd == 1:
-        cid = request.form['classID']
-        try:
-            uid = session.get('id', None)
-            x = -1
-            for i in range(3):
-                if session.get(str(i+1), None) == 0:
-                    x = i
-                    break
-            
-            db(False, ["UPDATE user SET u_clike{0} = {1} WHERE u_id = '{2}'".format(str(x+1), cid, uid)])
-            session[str(x+1)] = cid #세션 다시 불러오기
-            if x == -1: return 'f'
-            else: return 's'
-        except:
-            return redirect('/board/'+str(cid))
-    else:
-        cid = request.form['classID']
-        try:
-            uid = session.get('id', None)
-            x = -1
-            for i in range(3):
-                if session.get(str(i+1), None) == cid:
-                    x = i+1
-                    break
-            
-            db(False, ["UPDATE user SET u_clike{0} = {1} WHERE u_id = '{2}'".format(str(x), 0, uid)])
-            session.pop(str(x),None)#세션 다시 불러오기
+    user_id = session.get('id', None)
+    class_id = request.form['classID']
+    con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+    cur = con.cursor()
+
+    try:
+        if isAdd == 1:      #isAdd 1: 좋아요 추가, isAdd 0: 좋아요 삭제
+            cur.execute("SELECT l_id FROM liked_class WHERE l_uid='{0}'".format(user_id))
+            if len(cur.fetchall()) == 3: 
+                con.close()
+                return 'f'
+    
+            cur.execute("INSERT INTO liked_class(l_cid,l_uid) VALUES({0},'{1}')".format(class_id, user_id))
+            con.commit()
+            con.close()
             return 's'
-        except:
-            return redirect('/board/'+str(cid))
+        else:
+            cur.execute("DELETE FROM liked_class WHERE l_cid={0} AND l_uid='{1}'".format(class_id, user_id))
+            con.commit()
+            con.close()
+            return 's'
+    except: return 'db_error'
 
 
 @app.route('/isDub',methods=['POST'])

@@ -103,9 +103,12 @@ button{cursor:pointer;border:0;}
         &:hover{box-shadow: 0 0 6px .1px rgb(28,51,91);}
     }
     &.--label{
+        width:auto;
         background-color: rgba(28,51,91,60%);
         backdrop-filter:blur(10px);
         cursor:auto;
+        padding:0 10px 0 10px;
+        min-width:120px;
         &:hover{box-shadow: 0 0 6px .1px rgb(28,51,91);}
     }
     &.--login{
@@ -113,6 +116,13 @@ button{cursor:pointer;border:0;}
         &:hover{box-shadow:0 0 6px .1px rgb(175,175,175);}
     }
     &.--yes{
+        background-color:rgb(235, 235, 235);
+        margin:0;
+        &:hover{box-shadow:0 0 6px .1px rgb(175,175,175);}
+    }
+    &.--full{
+        width:253px;
+        margin:0;
         background-color:rgb(235, 235, 235);
         margin:0;
         &:hover{box-shadow:0 0 6px .1px rgb(175,175,175);}
