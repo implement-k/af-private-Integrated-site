@@ -8,6 +8,52 @@
         <script src=" {{ url_for('static', filename='javascript/board.js') }}"></script>
     </head>
     <body class="main-section">
+        <section class="modal" id="yn">
+            <span class="material-symbols-rounded" style="font-size:40px">error</span>
+            <p class="modal-p">오류</p>
+            <button class="middle-round --login" onclick="closeModal()">아니요</button>
+            <button class="middle-round --yes" onclick="execute()">예</button>
+        </section>
+        <section class="modal --post" id="post">
+            <div class="post-modal_content">
+                <div>
+                    <div class="post-modal_content_title">
+                        <h1 class="modal-title" id="modal-title">제목</h1>
+                        <button class="middle-round --close" onclick="closePost('{{class_info[0]}}','{{class_info[1]}}')"><span class="material-symbols-rounded">close</span></button>
+                    </div>
+                    <button class="small-round">
+                        <!--TODO 사용자 계정 사진-->
+                        <img class="profile-img --small" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                        <p class="small-font" id="modal-user">user id</p> 
+                    </button>
+                    <p class="modal-content" id="modal-content">내용</p>
+                </div>
+                <div class="post-modal_content_buttons --section">
+                    {% if user_info[0] %}
+                    <div class="post-modal_content_buttons">
+                        <button class="small-round-response --big-favorite">
+                            <span class="material-symbols-rounded">favorite</span>
+                            <span id="modal-favorite">0</span>
+                        </button>
+                        <button class="small-round-response --big-icon-circle"><span class="material-symbols-rounded">bookmark</span></button>
+                    </div>
+                    {%endif%}
+                    <button class="small-round-response --big-icon-circle"><span class="material-symbols-rounded">menu</span></button>
+                </div>
+            </div>
+            <div class="post-modal_comment">
+                <div class="post-modal_comment__view">
+                    <h2>댓글</h2>
+                    <div style="overflow-y:scroll">
+                        
+                    </div>
+                </div>
+                <div class="post-modal_comment__write">  
+                    <input type="text" class="post-modal_comment__input" placeholder="댓글 달기">
+                    <button class="small-round-response --comment-add"><span class="material-symbols-rounded" style="color:rgb(245,245,245)">add</span></button>
+                </div>
+            </div>
+        </section>
         <header class="nav">
             <div class="nav-main">
                 <button class="head-title" onclick="location.href='/'">
@@ -24,8 +70,10 @@
                             </div>
                         </div>
                     </div>
+                    {% if user_info[0] %}
                     <button class="middle-round --main" onclick="location.href='/calender'">캘린더</button>
                     <button class="middle-round --main" onclick="location.href='/friend/management'">친구관리</button>
+                    {% endif %}
                 </nav>
             </div>
             {% if user_info[0] %}
@@ -37,48 +85,58 @@
         <section class="content">
             <div style="height: 110px"></div>
             {%for post in post_list%}
+            {%if post[0] == post_id%}
+            <script>isPost('{{post[0]}}','{{post[1]}}','{{post[2]}}','{{post[3]}}','{{post[5]}}')</script>
+            {%endif%}
             <div class="post-card">
                 <div class="post-card_action">
                     <div class="post-card_action">
-                        <h3 class="margin-top-add">{{post[2]}}</h3>
+                        <h3 class="margin-top-add" id="title{{post[0]}}">{{post[2]}}</h3>
                         <button class="small-round">
                             <!--TODO 사용자 계정 사진-->
                             <img class="profile-img --small" src="{{url_for('static', filename='image/default_profile.jpg')}}">
-                            <p class="small-font">{{post[1]}}</p>
+                            <p class="small-font">{{post[1]}}</p> 
                         </button>
                     </div>
                     {% if user_info[0] == post[1] %}
                     <div class="post-card_action">
-                        <button class="small-round-border --edit" title="수정하기"><span class="material-symbols-rounded">edit</span></button> 
-                        <button class="small-round-border --delete" title="삭제하기"><span class="material-symbols-rounded">close</span></button>
+                        <button class="small-round-border --edit" title="수정하기" onclick="showModal('edit','{{post[0]}}','{{class_info[0]}}','{{class_info[1]}}')"><span class="material-symbols-rounded">edit</span></button> 
+                        <button class="small-round-border --delete" title="삭제하기" onclick="showModal('del','{{post[0]}}')"><span class="material-symbols-rounded">close</span></button>
                     </div>
                     {% endif %}
                 </div>
-                <p class="content-p">{{post[3]}}</p>
+                <p class="content-p" id='content{{post[0]}}'>{{post[3]}}</p>
                 <div class="post-card_action --bottom">
                     <div class="post-card_action">
-                            <button class="small-round-response --favorite">
-                                <span class="material-symbols-rounded">favorite</span>
-                                <span>{{post[5]}}</span>
-                            </button>
-                            <button class="small-round-response --icon-circle"><span class="material-symbols-rounded">bookmark</span></button>
-                            <p class="small-font --date">{{post[4]}}</p>
+                        {% if user_info[0] %}
+                        <button class="small-round-response --favorite" onclick="favorite('{{post[0]}}')">
+                            <span class="material-symbols-rounded">favorite</span>
+                            <span>{{post[5]}}</span>
+                        </button>
+                        <button class="small-round-response --icon-circle"><span class="material-symbols-rounded">bookmark</span></button>
+                        {% endif %}
+                        <p class="small-font --date">{{post[4]}}</p>
                     </div>
-                    <button class="small-round-response --icon-circle">
-                        <span class="material-symbols-rounded">forum</span>
-                    </button>
+                    <button class="small-round-response --icon-circle" onclick="showPost('{{class_info[0]}}','{{class_info[1]}}','{{post[0]}}','{{post[1]}}','{{post[2]}}','{{post[3]}}','{{post[5]}}')"><span class="material-symbols-rounded">forum</span></button>
                 </div>
             </div>
             {%endfor%}
             <!-- TODO 페이징 구현 -->
         </section>
+        {% if user_info[0] %}
         <footer class="post-function --section">
             <div class="post-function">
                 <button class="circle --board" id="class_like" onclick="addLikeClass('{{class_info[0]}}','{{isLiked}}')"><span class="material-symbols-rounded star" id="star">kid_star</span></button>
                 <button class="circle --board"><span class="material-symbols-rounded">search</span></button>
-                <button class="circle --board" id="add" onclick="location.href='/board/0&{{class_info[0]}}&{{class_info[1]}}'"><span class="material-symbols-rounded">add</span></button>
+                <button class="circle --board" id="add" onclick="location.href='/board/0&{{class_info[0]}}&{{class_info[1]}}&0'"><span class="material-symbols-rounded">add</span></button>
             </div>
             <script>isLiked('{{isLiked}}')</script>
         </footer>
+        {% endif %}
+        <button class="dimlayer --comment" id="dimlayer_comment" onclick="closePost('{{class_info[0]}}','{{class_info[1]}}')"></button>
+        <div class="dimlayer" id="dimlayer"></div>
+        {%if post_id != 0%}
+        <script>preshowPost()</script>
+        {%endif%}
     </body>
 </html>

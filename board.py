@@ -81,8 +81,8 @@ def signup():
         else: return render_template('signup.html')
         
 
-@app.route('/board/<int:mode>&<int:class_id>&<class_name>',methods=['POST', 'GET'])
-def board(mode, class_id, class_name):    #mode 1: 글보기, mode 0: 글작성, mode 2,3 저장한 게시물, 내가쓴글
+@app.route('/board/<int:mode>&<int:class_id>&<class_name>&<int:post_id>',methods=['POST', 'GET'])
+def board(mode, class_id, class_name, post_id):    #mode 0: 글작성, mode 1: 글보기, mode 2: 글 수정, mode 2,3 저장한 게시물, 내가쓴글
     user_id = session.get('id', None)       #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
     if not user_id and class_id != 1: return redirect('/login')
 
@@ -103,13 +103,15 @@ def board(mode, class_id, class_name):    #mode 1: 글보기, mode 0: 글작성,
         isLiked = 0
         if len(result[2]) != 0: isLiked = 1
 
-        return render_template('board.html', post_list=post_list, user_info=user_info, class_info=class_info, isLiked=isLiked)
+        return render_template('board.html', post_list=post_list, user_info=user_info, class_info=class_info, isLiked=isLiked, post_id=post_id)
     elif mode == 0:
         if not user_id: return redirect('/login')
         else: 
-            result = db(True, ["SELECT c_intro FROM post_class WHERE c_id={0}".format(class_id)])[0]
-            class_info = [class_id, class_name, result[0][0]]     #index 0: class id, index 1: class name, index 2:class intro
-            return render_template('write.html', class_info=class_info, user_info=user_info)
+            class_info = [class_id, class_name]     #index 0: class id, index 1: class name
+            return render_template('write.html', class_info=class_info, user_info=user_info, isEdit='0')
+    elif mode == 2:
+        class_info = [class_id, class_name]
+        return render_template('write.html', class_info=class_info, user_info=user_info, isEdit='1')
 
 
 @app.route('/',methods=['POST', 'GET'])
@@ -126,7 +128,7 @@ def home():
             
         return render_template('home.html', class_list=class_list, liked_class_list=liked_class_list, user_info=user_info)
     else:
-        return redirect('/board/1&1&계룡대')
+        return redirect('/board/1&1&공군&0')
 
 
 @app.route('/friend/management')
@@ -160,13 +162,25 @@ def privateUser():
     else: return redirect('/login')
 
 
-@app.route('/createPost/<int:class_id>', methods=['POST']) 
-def createPost(class_id):
+@app.route('/createPost/<int:class_id>&<mode>', methods=['POST']) 
+def createPost(class_id,mode):
     user_id = session.get('id', None)
     title = request.form.get('title')
     content = request.form.get('content')
-    db(False, ["INSERT INTO posts(p_uid,p_title,p_content,p_created,p_classification) VALUES('{0}','{1}','{2}',Now(),{3})".format(user_id, title, content, class_id)])
+    pid = request.form.get('pid')
+    if mode == 'create':
+        db(False, ["INSERT INTO posts(p_uid,p_title,p_content,p_created,p_classification) VALUES('{0}','{1}','{2}',Now(),{3})".format(user_id, title, content, class_id)])
+    else:
+        db(False, ["UPDATE posts SET p_title='{0}', p_content='{1}' WHERE p_id='{2}'".format(title, content, pid)])
     return '1'
+
+
+@app.route('/deletePost/<int:post_id>', methods=['POST']) 
+def deletePost(post_id):
+    try:
+        db(False, ["DELETE FROM posts WHERE p_id={0}".format(post_id)])
+        return 's'
+    except:return 'f'
 
 
 @app.route('/likeClass/<int:isAdd>',methods=['POST'])

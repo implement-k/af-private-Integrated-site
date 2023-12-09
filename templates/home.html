@@ -32,7 +32,7 @@
                         </div>
                         {%else%}
                         {%for c in liked_class_list%}
-                        <a class="a-margin-top-add" href="/board/1&{{c[0]}}&{{c[1]}}">{{c[1]}}</a>
+                        <a class="a-margin-top-add" href="/board/1&{{c[0]}}&{{c[1]}}&0">{{c[1]}}</a>
                         {%endfor%}
                         {%endif%}
                     </div>
@@ -41,7 +41,7 @@
                     <h2 class="margin-top-remove">모든 게시판</h2>
                     <div>
                         {%for c in class_list%}
-                            <a class="a-margin-top-add" href="/board/1&{{c[0]}}&{{c[1]}}">{{c[1]}}</a>
+                            <a class="a-margin-top-add" href="/board/1&{{c[0]}}&{{c[1]}}&0">{{c[1]}}</a>
                         {%endfor%}
                     </div>
                 </div>

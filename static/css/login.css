@@ -11,7 +11,6 @@ h1, p, button, span, input, div{font-family:'Noto Sans KR', sans-serif;}
     justify-content:center;
     background-color:rgb(245, 245, 245);
 }
-
 .login-main{width:450px;}
 
 .login-form_input{

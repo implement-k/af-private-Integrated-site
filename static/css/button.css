@@ -36,7 +36,9 @@ button{cursor:pointer;border:0;}
     background-color: rgb(235, 235, 235);
     margin-right: 4px;
     &.--favorite {padding:0 8px 0 6px;}
+    &.--big-favorite{padding:0 8px 0 6px;height:34px;border-radius:17px;margin-right:8px;}
     &.--icon-circle{width: 28px;}
+    &.--big-icon-circle{height:34px;width:34px;border-radius: 17px;}
     &.--signup-pw{
         height:30px;
         border-radius: 0 0 25px 25px;
@@ -51,6 +53,17 @@ button{cursor:pointer;border:0;}
         transition:all .3s ease;
         &:focus{background-color:rgb(215, 219, 228);outline:0;}
         &:disabled{background-color:rgb(180, 225, 170);}
+    }
+    &.--comment-add{
+        position:absolute;
+        right:6px;
+        z-index:2;
+        top: 50%;
+        transform: translate(0, -50%);
+        height:40px;
+        width:40px;
+        border-radius: 17px;
+        background:rgb(28, 51, 91);
     }
     &>.material-symbols-rounded{
         font-size:medium;
@@ -126,6 +139,16 @@ button{cursor:pointer;border:0;}
         background-color:rgb(235, 235, 235);
         margin:0;
         &:hover{box-shadow:0 0 6px .1px rgb(175,175,175);}
+    }
+    &.--close{
+        visibility:hidden;
+        position:absolute;
+        background-color:rgb(235, 235, 235);
+        width:50px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        right:0;
     }
 }
 
@@ -217,4 +240,8 @@ button{cursor:pointer;border:0;}
     align-items: center;
     justify-content: center;
     background-color: rgb(28,51,92);
+}
+
+@media(max-width:767px) {
+    .middle-round.--close{visibility:visible;}
 }

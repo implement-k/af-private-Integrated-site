@@ -4,8 +4,8 @@
         {% include "header.html"%}
         <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
         <title>공군 병사 통합 홈페이지</title>
-        <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <script defer src=" {{ url_for('static', filename='javascript/write.js') }}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src=" {{ url_for('static', filename='javascript/write.js') }}"></script>
     </head>
     <body style="position:relative">
         <section class="modal" id="yn">
@@ -36,17 +36,30 @@
             </header>
             <sction class="content">
                 <div style="height: 110px"></div>
+                    {%if isEdit == '0'%}
                     <h1 class="write-h1">글작성</h1>
+                    {%else%}
+                    <h1 class="write-h1">글수정</h1>
+                    {%endif%}
                     <input type="text" class="write-text --title" id="title" placeholder="제목을 입력해주세요"><br>
                     <textarea class="write-text --content" id="content" placeholder="주의사항&#13"></textarea>
                     <div class="main-section">
                         <div>
                             <button type="button" class="large-round --back" onclick="showModal('back')">이전</button>
+                            {%if isEdit == '0'%}
                             <button type="button" class="large-round --write" onclick="showModal('create')">게시물 쓰기</button>
+                            {%else%}
+                            <button type="button" class="large-round --write" onclick="showModal('edit')">게시물 수정</button>
+                            {%endif%}
                         </div>
                 </div>
             </sction>
         </div>
         <div class="dimlayer"></div>
+        {%if isEdit == '1'%}
+        <script>isEdit()</script>
+        {%else%}
+        <!-- TODO 링크의 mode가 2라면 잘못된 페이지 -->
+        {%endif%}
     </body>
 </html>

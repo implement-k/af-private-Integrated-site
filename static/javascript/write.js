@@ -4,7 +4,9 @@ const showModal = (link) => {
     page = link;
     $('#yn').css("visibility","visible");
     $('.dimlayer').css("visibility","visible");
+    $('.modal-p').text("글 작성을 중지하시겠습니까?")
     if (page === 'create') {$('.modal-p').text("글을 올리겠습니까?");}
+    else if (page === 'edit'){$('.modal-p').text("글을 수정하시겠습니까?");}
 };
 
 const closeModal = () => {
@@ -22,7 +24,7 @@ const goPage = (class_id, class_name) => {
     var title = $('#title').val();
     var content = $('#content').val();
     if (page === 'back') {history.back();}
-    else if (page === 'create') {
+    else if (page === 'create' || page === 'edit') {
         $('#yn').css("visibility","hidden");
         $('.dimlayer').css("visibility","hidden");
         if (title.length === 0) {
@@ -42,7 +44,8 @@ const goPage = (class_id, class_name) => {
             $('#cancel').css("visibility","visible");
             $('.dimlayer').css("visibility","visible");
         } else {
-            createLink = '/createPost/'+class_id;
+            const createLink = '/createPost/'+class_id+'&'+page;
+            let pid = localStorage.getItem("post_id")||0;
             const specialChars = /['"\\%_]/g;
             const escapeChars = {"'": "\\'",'"': '\\"','\\': '\\\\','%': '\\%','_': '\\_'};
             
@@ -52,8 +55,8 @@ const goPage = (class_id, class_name) => {
             try{
                 $.ajax({
                     type: "POST", url: createLink,
-                    data: {'title': title, 'content': content},
-                    success : function() {location.href = '/board/1&'+class_id+'&'+class_name;},
+                    data: {'title': title, 'content': content, 'pid':pid},
+                    success : function() {location.href = '/board/1&'+class_id+'&'+class_name+'&0';},
                     error : function() {alert("error")}
                 });
             } catch(e) {
@@ -66,4 +69,11 @@ const goPage = (class_id, class_name) => {
 const createPost = () => {
     $('#yn').css("visibility","visible");
     $('.dimlayer').css("visibility","visible");
+}
+
+const isEdit = () => {
+    let title = localStorage.getItem("title");
+    let content = localStorage.getItem("content");
+    $('#title').val(title)
+    $('#content').text(content)
 }
