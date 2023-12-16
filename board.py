@@ -1,9 +1,16 @@
 from flask import Flask, render_template, url_for, request, session, redirect
-from connect_afpsDB import U,P,H,D
+from dotenv import load_dotenv
 import pymysql, uuid, re
+import os 
 
 app = Flask(__name__)
 app.secret_key = uuid.uuid4().hex
+
+load_dotenv()
+U = os.environ.get('user')
+P = os.environ.get('password')
+H = os.environ.get('host')
+D = os.environ.get('db')
 
 
 def db(isOutput, sql):
@@ -83,7 +90,7 @@ def signup():
 
 @app.route('/board/<int:mode>&<int:class_id>&<class_name>&<int:post_id>',methods=['POST', 'GET'])
 def board(mode, class_id, class_name, post_id):    #mode 0: 글작성, mode 1: 글보기, mode 2: 글 수정, mode 2,3 저장한 게시물, 내가쓴글
-    user_id = session.get('id', None)       #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
+    user_id = session.get('id', None)               #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
     if not user_id and class_id != 1: return redirect('/login')
 
     user_intro = session.get('user_intro', None)
@@ -92,10 +99,10 @@ def board(mode, class_id, class_name, post_id):    #mode 0: 글작성, mode 1: �
     user_info = [user_id, user_intro]
     
     if mode == 1:
-        sql = ["SELECT * FROM posts WHERE p_classification = {0}".format(class_id),
+        sql = ["SELECT p_id,p_uid,p_title,p_content,p_created,p_like,lp_uid FROM posts LEFT OUTER JOIN liked_post ON posts.p_id = liked_post.lp_id AND liked_post.lp_uid = '{0}' WHERE p_classification = {1}".format(user_id,class_id),
         "SELECT c_intro FROM post_class WHERE c_id={0}".format(class_id),
         "SELECT l_id FROM liked_class WHERE l_uid='{0}' and l_cid={1}".format(user_id, class_id)]
-
+# 
         result = db(True, sql)
         post_list = result[0]
         class_info = [class_id, class_name, result[1][0][0]]     #index 0: class id, index 1: class name, index 2:class intro
@@ -133,7 +140,28 @@ def home():
 
 @app.route('/friend/management')
 def manageFriend():
-    return render_template('friend_management.html')
+    user_id = session.get('id', None)
+    friend_list=[]      #친구
+    reception_list=[]   #친구신청 받은것6
+    send_list=[]        #친구신청보낸것
+
+    try:
+        con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+        cur = con.cursor()
+        cur.execute("SELECT f_toid,f_friend FROM friend WHERE f_fromid='{0}'".format(user_id))
+        result = cur.fetchall()
+        con.close()
+    except: return "db_error"
+    
+    for i in result:
+        if i[1] == 0:
+            reception_list.append(i[0])
+        elif i[1] == 1:
+            friend_list.append(i[0])
+        else:
+            send_list.append(i[0])
+
+    return render_template('friend_management.html', friend_list=friend_list, reception_list=reception_list, send_list=send_list, user_id=user_id)
 
 
 @app.route('/calender')
@@ -146,19 +174,28 @@ def calender():
     return render_template('calender.html', user_info=user_info)
 
 
-@app.route('/user')
-def privateUser():
+@app.route('/user/<name>&<int:mode>')
+def privateUser(name, mode):                  #mode 0: 개인, mode 1 남
     user_id = session.get('id', None)
     if user_id:
-        user_intro = session.get('user_intro', None)
-        if not user_intro: user_intro="자기소개가 없습니다."
-        user_info = [user_id, user_intro]
-        # 미리 보기 5개까지만
-        friend_list=['asd','dfff','df']
-        # friend_list=[]
-        friend_request_list=['fff','12user','fkuser']
-        # friend_request_list=[]
-        return render_template('user.html', user_info=user_info, friend_list=friend_list, friend_request_list=friend_request_list)
+        if (mode == 0 and user_id == name) or (mode == 1 and user_id == name):
+            user_intro = session.get('user_intro', None)
+            if not user_intro: user_intro="자기소개가 없습니다."
+            user_info = [user_id, user_intro]
+            # 미리 보기 5개까지만
+            friend_list=['asd','dfff','df']
+            # friend_list=[]
+            friend_request_list=['fff','12user','fkuser']
+            # friend_request_list=[]
+            return render_template('user.html', user_info=user_info, friend_list=friend_list, friend_request_list=friend_request_list)
+        else:
+            result = db(True, ["SELECT u_intro FROM user WHERE u_id = '{0}'".format(name)])[0]
+            user_intro = 'null'
+            if len(result) == 0: return '해당 유저가 없습니다.'
+            else: 
+                user_intro = result[0][0]
+                if not user_intro: user_intro="자기소개가 없습니다."
+                return render_template('friend.html',user_id=name, user_intro=user_intro)
     else: return redirect('/login')
 
 
@@ -183,29 +220,94 @@ def deletePost(post_id):
     except:return 'f'
 
 
-@app.route('/likeClass/<int:isAdd>',methods=['POST'])
+@app.route('/likePost/<int:post_id>&<int:mode>', methods=['POST'])  #mode 0:좋아요 추가, mode 1:좋아요 취소
+def likePost(post_id,mode):
+    user_id = session.get('id', None)
+    con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+    cur = con.cursor()
+
+    try:
+        cur.execute("SELECT COUNT(*) FROM liked_post WHERE lp_id={0} AND lp_uid='{1}'".format(post_id, user_id))
+        result = cur.fetchone()[0]
+    except:
+        con.close()
+        return 'db_error'
+
+    if mode == 0:
+        if result != 0:
+            con.close()
+            return 'error'
+        else:
+            try: 
+                cur.execute("INSERT INTO liked_post(lp_id,lp_uid) VALUES({0},'{1}')".format(post_id, user_id))
+                cur.execute("UPDATE posts SET p_like=p_like+1 WHERE p_id={0}".format(post_id))
+                con.commit()
+                con.close()
+            except: return 'db_error'
+            return 'success'
+    elif mode == 1:
+        if result == 0:
+            con.close()
+            return 'error'
+        else:
+            try: 
+                cur.execute("DELETE FROM liked_post WHERE lp_id={0} AND lp_uid='{1}'".format(post_id, user_id))
+                cur.execute("UPDATE posts SET p_like=p_like-1 WHERE p_id={0}".format(post_id))
+                con.commit()
+                con.close()
+            except: return 'db_error'
+            return 'success'
+    else: return 'fail'
+
+
+@app.route('/likeClass/<int:isAdd>',methods=['POST'])   #isAdd 1: 좋아요 추가, isAdd 0: 좋아요 삭제
 def likeClass(isAdd):
     user_id = session.get('id', None)
     class_id = request.form['classID']
     con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
     cur = con.cursor()
 
-    try:
-        if isAdd == 1:      #isAdd 1: 좋아요 추가, isAdd 0: 좋아요 삭제
-            cur.execute("SELECT l_id FROM liked_class WHERE l_uid='{0}'".format(user_id))
-            if len(cur.fetchall()) == 3: 
-                con.close()
-                return 'f'
-    
+    if isAdd == 1:      
+        try: cur.execute("SELECT l_id FROM liked_class WHERE l_uid='{0}'".format(user_id))
+        except: return 'db_error'
+
+        if len(cur.fetchall()) == 3: 
+            con.close()
+            return 'fail'
+
+        try: 
             cur.execute("INSERT INTO liked_class(l_cid,l_uid) VALUES({0},'{1}')".format(class_id, user_id))
             con.commit()
             con.close()
-            return 's'
-        else:
+        except: return 'db_error'
+        return 'success'
+    else:
+        try:
             cur.execute("DELETE FROM liked_class WHERE l_cid={0} AND l_uid='{1}'".format(class_id, user_id))
             con.commit()
             con.close()
-            return 's'
+        except: return 'db_error'
+        return 'success'
+
+
+@app.route('/bookmarkPost/<int:post_id>',methods=['POST'])
+def bookmarkPost(post_id):
+    user_id = session.get('id', None)
+    class_id = request.form['classID']
+    con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+    cur = con.cursor()
+
+    try:
+        cur.execute("SELECT s_id FROM saved_post WHERE s_id={0} AND s_uid='{1}'".format(post_id, user_id))
+        return str(cur.fetchall())
+        # if len(cur.fetchall()) > 0: 
+        #     con.close()
+        #     return 'f'
+        
+        cur.execute("INSERT INTO saved_class(s_id,s_uid) VALUES({0},'{1}')".format(post_id, user_id))
+        con.commit()
+        con.close()
+        return 's'
     except: return 'db_error'
 
 
@@ -217,6 +319,40 @@ def dubCheck():
         return str(len(db(True, ["SELECT {0} FROM user WHERE {0}='{1}'".format(name, value)])[0])) #중복이면 1, 중복 아니면 0
     except Exception as e:
         return 'error'
+
+
+@app.route('/manageFriend/<int:mode>&<friend_id>',methods=['POST'])
+def editFriend(mode,friend_id):
+    user_id = session.get('id', None)
+    con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+    cur = con.cursor()
+    try:
+        if mode == 0:
+            cur.execute("SELECT f_fromid,f_friend FROM friend WHERE f_fromid='{0}' AND f_toid='{1}'".format(user_id, friend_id))
+            result = cur.fetchall()
+            con.close()
+
+            if len(result) != 0 and result[0][1] == 1: return 'friend'
+            elif len(result) == 0 or result[0][1] == 0: return 's'
+            elif result[0][1] == 2: return 'request'
+        elif mode == 1:
+            cur.execute("SELECT f_friend FROM friend WHERE f_fromid='{0}' AND f_toid='{1}'".format(user_id, friend_id))
+            result = cur.fetchall()
+
+            if len(result) == 0:
+                cur.execute("INSERT INTO friend(f_fromid, f_toid, f_friend) VALUES('{0}','{1}',2),('{1}','{0}',0)".format(user_id, friend_id))
+            elif result[0][0] == 0:
+                cur.execute("UPDATE friend SET f_friend=1 WHERE (f_fromid='{0}' AND f_toid='{1}') OR (f_fromid='{1}' AND f_toid='{0}')".format(user_id, friend_id))
+
+            con.commit()
+            con.close()
+            return 's'
+        else: 
+            cur.execute("DELETE FROM friend WHERE (f_fromid='{0}' AND f_toid='{1}') OR (f_fromid='{1}' AND f_toid='{0}')".format(user_id, friend_id))
+            con.commit()
+            con.close()
+            return 's'
+    except:return 'f'
 
 
 app.run(debug=True)

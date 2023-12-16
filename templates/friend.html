@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>친구</title>
+        {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src=" {{ url_for('static', filename='javascript/friend.js') }}"></script>
+    </head>
+    <body class="main-section">
+        <header class="nav">
+            <div class="nav-main">
+                <button class="head-title" onclick="location.href='/'">
+                    <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                    <h1 class="main-title">병사 통합 홈페이지</h1>
+                </button>
+                <nav>
+                    <button class="middle-round --main" onclick="history.back()">이전으로</button>
+                </nav>
+            </div>
+        </header>
+        <div class="content">
+            <div style="height: 110px"></div>
+            <div class="board-list-card --friend">
+                <div>
+                    <img class="profile-img --xlarge" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                    <h1 class="friend-h">{{user_id}}</h1>
+                    <p class="friend-p">{{user_intro}}</p>
+                </div>
+                <button class="small-round-response" id="friend_btn" onclick="addFriend('{{user_id}}')">친구추가</button>
+            </div>
+        </div>
+        <script>isFriend('{{user_id}}');</script>
+    </body>
+</html>

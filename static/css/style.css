@@ -13,6 +13,11 @@ a{text-decoration-line:none;color:black;}
 .class_info-p{margin:0;font-size:large}
 .modal-title{position:absolute;font-size:xx-large;margin-bottom:5px;word-wrap:break-word;left: 50%;transform: translate(-50%,0);}
 .modal-content{font-size:large;word-wrap:break-word;}
+.friend-h{margin:6px 0 15px 0;}
+.friend-p{margin:0;}
+.margin-left-h{margin-left:15px;}
+.no-margin{margin:0}
+.margin-left-p{margin:0 0 0 10px;}
 
 /* default setting */
 body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
@@ -52,6 +57,10 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
         height:50px;
         width:50px;
     }
+    &.--medium{
+        height:30px;
+        width:30px;
+    }
     &.--small{
         height:18px;
         width:18px;
@@ -61,7 +70,7 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
 
 .main-logo{height:35px;margin-right:15px;}
 
-/* board, home, write */
+/* board, home, write, friend,friend_management */
 .board-list-card{
     width:100%;
     box-sizing:border-box;
@@ -73,6 +82,19 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
     &.--user{text-align:left;}
     &.--private{flex:1;min-width:300px;margin-right: 20px;}
     &.--no-padding{padding:0}
+    &.--friend{
+        display:flex;
+        align-items:end;
+        justify-content:space-between;
+    }
+    &.--friend-main{width:400px;margin-left:10px;margin-right:10px;}
+    &.--friend-tab{
+        padding:0;
+        width:400px;
+        margin-left:10px;
+        margin-right:10px;
+        &.--rt{height:250px;}
+    }
 }
 
 /* home*/
@@ -231,7 +253,84 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
         resize:none;
     }
 }
+
+/* friend_management */
+.main-content{
+    display:flex;
+    justify-content:center;
+    box-sizing:border-box;
+    flex-wrap:wrap;
+}
+
+.friend-main_profile{
+    display:flex;
+    align-items:center;
+    margin-bottom:30px;
+    margin-top:10px;
+}
+
+.friend-main_info{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.friend-main_info_friend{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
  
+.friend-main_info_div{
+    display:flex;
+    justify-content:center;
+    width:50px;
+    color:rgb(175,175,175);
+}
+
+.friend-tab_label{
+    height:60px;
+    border-radius:25px 25px 0 0;
+    background-color:rgb(202,206,214);
+    width:100%;
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    padding:20px;
+}
+
+.friend-tab_content{
+    overflow-y:scroll;
+    overflow:auto;
+    box-sizing:border-box;
+    &.--request{padding:20px;height:190px;}
+    &.--default{padding:20px 20px 10px 20px;height:100%;}
+    &::-webkit-scrollbar{width:0px;}
+}
+
+.friend-card{
+    display:flex;
+    align-items:center;
+    margin-bottom: 10px;
+    justify-content:space-between;
+    &.--friend{background-color:transparent;border:0;}
+}
+
+.friend-empty-card{
+    display:flex;
+    width:100%;
+    justify-content:center;
+    align-items:center;
+    &.--rt{height:100%;}
+}
+
+.friend-card_profile{
+    display:flex;
+    align-items:center;
+}
+
 /* dropdown */
 .nav-main__dropdown{position:relative;display:inline-block;&:hover .dropdown__list{opacity:1;visibility:visible;}}
 
@@ -240,10 +339,10 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
     visibility:hidden;
     position:absolute;
     height:auto;
-    min-width:340px;
     z-index:1;
-    &.--profile{right:0px;}
-    &.--class-intro{left:0px;}
+    &.--profile{right:0px;min-width:340px;}
+    &.--class-intro{left:0px;min-width:340px;}
+    &.--menu{bottom:34px;width:126px;}
 }
 
 .dropdown__list_content{
@@ -254,6 +353,7 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
     height:auto;
     &.--profile{border-radius:37px;}
     &.--class-intro{border-radius:25px;width:355px}
+    &.--menu{border-radius:25px;display:flex;flex-direction:column;}
 }
 
 /* modal */

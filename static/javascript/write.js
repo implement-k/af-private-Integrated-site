@@ -45,23 +45,22 @@ const goPage = (class_id, class_name) => {
             $('.dimlayer').css("visibility","visible");
         } else {
             const createLink = '/createPost/'+class_id+'&'+page;
-            let pid = localStorage.getItem("post_id")||0;
+            let pid = localStorage.getItem("post_id");
             const specialChars = /['"\\%_]/g;
             const escapeChars = {"'": "\\'",'"': '\\"','\\': '\\\\','%': '\\%','_': '\\_'};
             
             title = title.replace(specialChars, match => escapeChars[match]);
             content = content.replace(specialChars, match => escapeChars[match]);
-            
             try{
                 $.ajax({
                     type: "POST", url: createLink,
                     data: {'title': title, 'content': content, 'pid':pid},
-                    success : function() {location.href = '/board/1&'+class_id+'&'+class_name+'&0';},
+                    success : function() {
+                        localStorage.removeItem("post_id")
+                        location.href = '/board/1&'+class_id+'&'+class_name+'&0';},
                     error : function() {alert("error")}
                 });
-            } catch(e) {
-                alert("error");
-            }
+            } catch(e) {alert("error");}
         }
     } else {location.href = page;}
 };
