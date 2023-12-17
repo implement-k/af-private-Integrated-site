@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, session, redirect
+from flask import Flask, render_template, url_for, request, session, redirect, jsonify
 from dotenv import load_dotenv
 import pymysql, uuid, re
 import os 
@@ -199,6 +199,15 @@ def privateUser(name, mode):                  #mode 0: 개인, mode 1 남
     else: return redirect('/login')
 
 
+# @app.route('/userPost/<int:isSaved>',methods=['POST'])  #isSaved 1: 저장한 글, isSaved 0:내가쓴글
+# def declare(isSaved):
+#     user_id = session.get('id',None)
+#     if isSaved == 1:
+#         db(False, ["INSERT INTO declare_user(d_isPost,d_cardID,d_uid) VALUES({0},{1},'{2}')".format(isPost,id,user_id)])
+#         return render_template('saved_post.html',user_id=name, user_intro=user_intro)
+#     return 'success'
+
+
 @app.route('/createPost/<int:class_id>&<mode>', methods=['POST']) 
 def createPost(class_id,mode):
     user_id = session.get('id', None)
@@ -293,21 +302,19 @@ def likeClass(isAdd):
 @app.route('/bookmarkPost/<int:post_id>',methods=['POST'])
 def bookmarkPost(post_id):
     user_id = session.get('id', None)
-    class_id = request.form['classID']
-    con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
-    cur = con.cursor()
 
     try:
+        con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+        cur = con.cursor()
         cur.execute("SELECT s_id FROM saved_post WHERE s_id={0} AND s_uid='{1}'".format(post_id, user_id))
-        return str(cur.fetchall())
-        # if len(cur.fetchall()) > 0: 
-        #     con.close()
-        #     return 'f'
+        if len(cur.fetchall()) > 0: 
+            con.close()
+            return 'fail'
         
-        cur.execute("INSERT INTO saved_class(s_id,s_uid) VALUES({0},'{1}')".format(post_id, user_id))
+        cur.execute("INSERT INTO saved_post(s_id,s_uid) VALUES({0},'{1}')".format(post_id, user_id))
         con.commit()
         con.close()
-        return 's'
+        return 'success'
     except: return 'db_error'
 
 
@@ -353,6 +360,44 @@ def editFriend(mode,friend_id):
             con.close()
             return 's'
     except:return 'f'
+
+
+@app.route('/getComment/<int:post_id>&<int:mode>',methods=['POST'])
+def getComment(post_id,mode): #mode 0 조회, mode 1 추가, mode 2 수정, mode 3 삭제, mode 4 대댓글 불러오기
+    if mode == 0:
+        user_id = session.get('id',None)
+        #0 cm_id, 1 cm_class, 2 cm_uid, 3 cm_created, 4 cm_content
+        result = db(True, ["SELECT cm_id,cm_class,cm_uid,DATE_FORMAT(cm_created, '%Y-%m-%d %H:%i'),cm_content FROM comment WHERE cm_postID={0} AND cm_group=0".format(post_id)])[0]
+        result = list(result)
+        result.append(user_id)
+        return jsonify(result)
+    elif mode == 1:
+        cm_class = 0
+        gruop = 0
+        user_id = session.get('id',None)
+        comment = request.form['comment']
+        db(False, ["INSERT INTO comment(cm_postID,cm_class,cm_group,cm_uid,cm_created,cm_content) VALUES({0},{1},{2},'{3}',NOW(),'{4}')".format(post_id,cm_class, gruop, user_id, comment)])
+        return 'success'
+    # elif mode == 2:
+    #     cm_id = 댓글 id 
+    #     content = 댓글 내용
+    #     db(False, ["UPDATE comment SET cm_content = '{0}' WHERE cm_id={1}".format(content, cm_id)])
+    #     return 'success'
+    elif mode == 3:
+        db(False, ["DELETE FROM comment WHERE cm_id={0}".format(post_id)])
+        return 'success'
+    # else:
+    #     #0 cm_id, 1 cm_uid, 2 cm_created, 3 cm_content
+    #     comment_id = 댓글 id
+    #     result = db(True, ["SELECT cm_id,cm_uid,DATE_FORMAT(cm_created, '%Y-%m-%d %H:%i'),cm_content FROM comment WHERE cm_gruop={1}".format(comment_id)])[0]
+    #     return jsonify(result)
+
+@app.route('/declare/<int:id>&<int:isPost>',methods=['POST'])
+def declare(id,isPost):
+    user_id = session.get('id',None)
+    db(False, ["INSERT INTO declare_user(d_isPost,d_cardID,d_uid) VALUES({0},{1},'{2}')".format(isPost,id,user_id)])
+    return 'success'
+
 
 
 app.run(debug=True)

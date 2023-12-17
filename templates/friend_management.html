@@ -27,18 +27,18 @@
                         <img class="profile-img --xlarge" src="{{url_for('static', filename='image/default_profile.jpg')}}">
                         <h2 class="margin-left-h">{{user_id}}</h2>
                     </div>
-                    <div class="friend-main_info">
-                        <div class="friend-main_info_friend">
+                    <div class="friend-main_info --container">
+                        <div class="friend-main_info --friend">
                             <p class="no-margin">&nbsp;&nbsp;친&nbsp;&nbsp;&nbsp;구&nbsp;&nbsp;</p>
                             <h2 class="no-margin">{{friend_list | length}}</h2>
                         </div>
                         <div class="friend-main_info_div">|</div>
-                        <div class="friend-main_info_friend">
+                        <div class="friend-main_info --friend">
                             <p class="no-margin">친구요청</p>
                             <h2 class="no-margin">{{reception_list | length}}</h2>
                         </div>
                         <div class="friend-main_info_div">|</div>
-                        <div class="friend-main_info_friend">
+                        <div class="friend-main_info --friend">
                             <p class="no-margin">&nbsp;신청중&nbsp;</p>
                             <h2 class="no-margin">{{send_list | length}}</h2>
                         </div>

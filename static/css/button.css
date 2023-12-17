@@ -1,4 +1,4 @@
-button{cursor:pointer;border:0;}
+button{cursor:pointer;border:0;color:black}
 
 .head-title{
     display:flex;
@@ -131,12 +131,14 @@ button{cursor:pointer;border:0;}
     &.--main{
         background-color:rgba(28,51,91,20%);
         backdrop-filter:blur(10px);
+        -webkit-backdrop-filter:blur(10px);
         &:hover{box-shadow: 0 0 6px .1px rgb(28,51,91);}
     }
     &.--label{
         width:auto;
         background-color: rgba(28,51,91,60%);
         backdrop-filter:blur(10px);
+        -webkit-backdrop-filter:blur(10px);
         cursor:auto;
         padding:0 10px 0 10px;
         min-width:120px;
@@ -250,6 +252,14 @@ button{cursor:pointer;border:0;}
     }
 }
 
+.small-icon{
+    background-color:transparent;
+    border:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
 .big_square_button {
     display:flex;
     height:90px;
@@ -278,4 +288,12 @@ button{cursor:pointer;border:0;}
 
 #unlike_icon{
     font-variation-settings:'FILL' 1,'wght' 400,'GRAD' -25,'opsz' 24
+}
+
+.comment-more{
+    font-size:small;
+    color:rgb(175,175,175);
+    padding:7px 0 0 0;
+    background-color:transparent;
+    border:transparent;
 }

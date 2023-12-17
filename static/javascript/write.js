@@ -51,6 +51,7 @@ const goPage = (class_id, class_name) => {
             
             title = title.replace(specialChars, match => escapeChars[match]);
             content = content.replace(specialChars, match => escapeChars[match]);
+            content = content.replace(/(?:\r\n|\r|\n)/g, '<br>');
             try{
                 $.ajax({
                     type: "POST", url: createLink,
