@@ -86,39 +86,89 @@ def signup():
     else:
         if "id" in session: return redirect('/')
         else: return render_template('signup.html')
-        
+
 
 @app.route('/board/<int:mode>&<int:class_id>&<class_name>&<int:post_id>',methods=['POST', 'GET'])
 def board(mode, class_id, class_name, post_id):    #mode 0: 글작성, mode 1: 글보기, mode 2: 글 수정, mode 2,3 저장한 게시물, 내가쓴글
-    user_id = session.get('id', None)               #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
-    if not user_id and class_id != 1: return redirect('/login')
+    user_id = session.get('id', None)              #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
+    if not user_id and class_id != 1:
+        return redirect('/login')
 
     user_intro = session.get('user_intro', None)
     if not user_intro: user_intro="자기소개가 없습니다."
 
-    user_info = [user_id, user_intro]
-    
     if mode == 1:
-        sql = ["SELECT p_id,p_uid,p_title,p_content,p_created,p_like,lp_uid FROM posts LEFT OUTER JOIN liked_post ON posts.p_id = liked_post.lp_id AND liked_post.lp_uid = '{0}' WHERE p_classification = {1}".format(user_id,class_id),
-        "SELECT c_intro FROM post_class WHERE c_id={0}".format(class_id),
-        "SELECT l_id FROM liked_class WHERE l_uid='{0}' and l_cid={1}".format(user_id, class_id)]
-# 
-        result = db(True, sql)
-        post_list = result[0]
-        class_info = [class_id, class_name, result[1][0][0]]     #index 0: class id, index 1: class name, index 2:class intro
-        
-        isLiked = 0
-        if len(result[2]) != 0: isLiked = 1
+        per_page = 10
 
-        return render_template('board.html', post_list=post_list, user_info=user_info, class_info=class_info, isLiked=isLiked, post_id=post_id)
-    elif mode == 0:
-        if not user_id: return redirect('/login')
-        else: 
-            class_info = [class_id, class_name]     #index 0: class id, index 1: class name
-            return render_template('write.html', class_info=class_info, user_info=user_info, isEdit='0')
-    elif mode == 2:
-        class_info = [class_id, class_name]
-        return render_template('write.html', class_info=class_info, user_info=user_info, isEdit='1')
+        con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+        cur = con.cursor()
+
+        cur.execute("SELECT COUNT(*) FROM posts WHERE p_classification = %s", (class_id)) 
+        total_post = cur.fetchone()[0]
+        end_page = total_post // per_page + 1
+        cur_page = min(int(request.args.get('page', 1)), end_page)
+        post_info = {'id':None, 'user_id':None, 'title':None, 'content':None, 'created':None, 'like':None}
+
+        if post_id != 0:
+            cur.execute("SELECT COUNT(*) FROM posts WHERE p_classification = %s AND p_id <= %s", (class_id, post_id))
+            post_index = cur.fetchone()[0] - 1
+            cur_page = (total_post - post_index) // per_page + 1
+            cur.execute("SELECT p_id, p_uid, p_title, p_content, p_created, p_like FROM posts WHERE p_id=%s", (post_id))
+            result = cur.fetchone()
+            if result:
+                post_info = {
+                    'id':result[0],
+                    'user_id':result[1],
+                    'title':result[2],
+                    'content':result[3],
+                    'created':result[4],
+                    'like':result[5]
+                }
+        
+        offset = (cur_page - 1) * per_page
+
+        cur.execute("""
+            SELECT p_id, p_uid, p_title, p_content, p_created, p_like, lp_uid 
+            FROM posts 
+            LEFT JOIN liked_post 
+            ON posts.p_id = liked_post.lp_id AND liked_post.lp_uid = %s 
+            WHERE p_classification = %s 
+            ORDER BY p_created DESC 
+            LIMIT %s OFFSET %s
+        """, (user_id, class_id, per_page, offset))
+        post_list = cur.fetchall()
+
+        cur.execute("SELECT c_intro FROM post_class WHERE c_id=%s", (class_id))
+        class_intro = cur.fetchall()[0][0]
+
+        cur.execute("SELECT l_id FROM liked_class WHERE l_uid=%s and l_cid=%s", (user_id, class_id))
+        liked_class = cur.fetchall()
+        con.close()
+
+        start_page = ((cur_page-1) // 10) * 10 + 1
+        mid_page = end_page if end_page < start_page + 10 else start_page + 9
+
+        return render_template(
+            'board.html',
+            post_list = post_list,
+            user_info = {'id':user_id, 'intro':user_intro},
+            class_info = {'id':class_id, 'name':class_name, 'intro':class_intro},
+            isLiked = 0 if len(liked_class) == 0 else 1,
+            post_id = post_id,
+            post_info = post_info,
+            pagination=[cur_page, start_page, mid_page, end_page, per_page, total_post]
+        )
+    elif mode == 0 or mode == 2:
+        if not user_id:
+            return redirect('/login')
+        else:
+            return render_template(
+                'write.html',
+                class_id = class_id,
+                class_name = class_name,
+                user_info = {'id':user_id, 'intro':user_intro},
+                isEdit = False if mode == 0 else True
+            )
 
 
 @app.route('/',methods=['POST', 'GET'])
@@ -138,32 +188,6 @@ def home():
         return redirect('/board/1&1&공군&0')
 
 
-@app.route('/friend/management')
-def manageFriend():
-    user_id = session.get('id', None)
-    friend_list=[]      #친구
-    reception_list=[]   #친구신청 받은것6
-    send_list=[]        #친구신청보낸것
-
-    try:
-        con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
-        cur = con.cursor()
-        cur.execute("SELECT f_toid,f_friend FROM friend WHERE f_fromid='{0}'".format(user_id))
-        result = cur.fetchall()
-        con.close()
-    except: return "db_error"
-    
-    for i in result:
-        if i[1] == 0:
-            reception_list.append(i[0])
-        elif i[1] == 1:
-            friend_list.append(i[0])
-        else:
-            send_list.append(i[0])
-
-    return render_template('friend_management.html', friend_list=friend_list, reception_list=reception_list, send_list=send_list, user_id=user_id)
-
-
 @app.route('/calender')
 def calender():
     user_id = session.get('id', None)       #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
@@ -174,13 +198,52 @@ def calender():
     return render_template('calender.html', user_info=user_info)
 
 
+@app.route('/friend/management')
+def manageFriend():
+    user_id = session.get('id', None)
+    
+    if user_id:
+        friends = []            #친구
+        friend_reception = []   #친구신청 받은 것
+        friend_request = []     #친구신청 보낸 것
+
+        try:
+            con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+            cur = con.cursor()
+            cur.execute("SELECT f_toid,f_friend FROM friend WHERE f_fromid='{0}'".format(user_id))
+            result = cur.fetchall()
+            con.close()
+        except: return "db_error"
+
+        for i in result:
+            if i[1] == 0:
+                friend_reception.append(i[0])
+            elif i[1] == 1:
+                friends.append(i[0])
+            else:
+                friend_request.append(i[0])
+
+        return render_template(
+            'friend_management.html',
+            friend_list = friends,
+            reception_list = friend_reception,
+            send_list = friend_request,
+            user_id = user_id
+        )
+    else:
+        return redirect('/login')
+
+
 @app.route('/user/<name>&<int:mode>')
 def privateUser(name, mode):                  #mode 0: 개인, mode 1 남
     user_id = session.get('id', None)
+
     if user_id:
-        if (mode == 0 and user_id == name) or (mode == 1 and user_id == name):
+        if user_id == name and (mode == 0 or mode == 1):
+            
             user_intro = session.get('user_intro', None)
             if not user_intro: user_intro="자기소개가 없습니다."
+
             user_info = [user_id, user_intro]
             # 미리 보기 5개까지만
             friend_list=['asd','dfff','df']
@@ -191,12 +254,14 @@ def privateUser(name, mode):                  #mode 0: 개인, mode 1 남
         else:
             result = db(True, ["SELECT u_intro FROM user WHERE u_id = '{0}'".format(name)])[0]
             user_intro = 'null'
-            if len(result) == 0: return '해당 유저가 없습니다.'
+            if len(result) == 0:
+                return '해당 유저가 없습니다.'
             else: 
                 user_intro = result[0][0]
                 if not user_intro: user_intro="자기소개가 없습니다."
                 return render_template('friend.html',user_id=name, user_intro=user_intro)
-    else: return redirect('/login')
+    else:
+        return redirect('/login')
 
 
 # @app.route('/userPost/<int:isSaved>',methods=['POST'])  #isSaved 1: 저장한 글, isSaved 0:내가쓴글
@@ -223,10 +288,8 @@ def createPost(class_id,mode):
 
 @app.route('/deletePost/<int:post_id>', methods=['POST']) 
 def deletePost(post_id):
-    try:
-        db(False, ["DELETE FROM posts WHERE p_id={0}".format(post_id)])
-        return 's'
-    except:return 'f'
+    db(False, ["DELETE FROM posts WHERE p_id={0}".format(post_id)])
+    return 'success'
 
 
 @app.route('/likePost/<int:post_id>&<int:mode>', methods=['POST'])  #mode 0:좋아요 추가, mode 1:좋아요 취소
@@ -366,8 +429,8 @@ def editFriend(mode,friend_id):
 def getComment(post_id,mode): #mode 0 조회, mode 1 추가, mode 2 수정, mode 3 삭제, mode 4 대댓글 불러오기
     if mode == 0:
         user_id = session.get('id',None)
-        #0 cm_id, 1 cm_class, 2 cm_uid, 3 cm_created, 4 cm_content
-        result = db(True, ["SELECT cm_id,cm_class,cm_uid,DATE_FORMAT(cm_created, '%Y-%m-%d %H:%i'),cm_content FROM comment WHERE cm_postID={0} AND cm_group=0".format(post_id)])[0]
+        #0 cm_id, 1 cm_class, 2 cm_group, 3 cm_uid, 4 cm_created, 5 cm_content
+        result = db(True, ["SELECT cm_id,cm_class,cm_group,cm_uid,DATE_FORMAT(cm_created, '%Y-%m-%d %H:%i'),cm_content FROM comment WHERE cm_postID={0} AND cm_group=0".format(post_id)])[0]
         result = list(result)
         result.append(user_id)
         return jsonify(result)

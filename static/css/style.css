@@ -189,6 +189,21 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
     justify-content:space-between;
     width:62%;
     padding:20px 20px 25px 30px;
+    box-sizing:border-box;
+    overflow:auto;
+    overflow-x:hidden;
+    &::-webkit-scrollbar{
+        width: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: rgb(175,175,175);
+        border-radius: 5px;
+        background-clip: padding-box;
+        border: 2px solid transparent;
+      }
+      &::-webkit-scrollbar-track{
+        background-color: transparent;
+      }
 }
 
 .post-modal_content__heading{
@@ -217,6 +232,17 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
 .post-modal_content_buttons{
     display:flex;
     &.--section{justify-content:space-between;}
+}
+
+.post-modal_comment_reply{
+    display:flex;
+    background-color:rgb(202, 206, 214);
+    box-shadow:inset 0 -3px 3px rgb(175,175,175);
+    justify-content: space-between;
+    padding:0;
+    align-items:center;
+    visibility:hidden;
+    height:0;
 }
 
 .post-modal_comment__write{
@@ -272,6 +298,7 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
 .comment-card_user{
     display:flex;
     align-items:center;
+    cursor:pointer;
 }
 
 .comment-card_user_info{
@@ -280,6 +307,7 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
 }
 
 .comment-card_content{
+    cursor:pointer;
     width:100%;    
     overflow-wrap: break-word;
     word-wrap: break-word;
@@ -287,6 +315,17 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
     display:flex;
     justify-content:space-between;
     align-items:center;
+}
+
+.nav_arrow{font-size:20px;}
+                
+.pagination{
+    display:flex;
+    width:100%;
+    justify-content:center;
+    align-items:center;
+    height:35px;
+    margin: 30px 0 110px 0;
 }
 
 /* write */
@@ -394,7 +433,7 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
     z-index:1000;
     &.--profile{right:0px;min-width:340px;}
     &.--class-intro{left:0px;min-width:340px;}
-    &.--menu{bottom:34px;width:126px;}
+    &.--menu{bottom:34px;right:0;width:75px;}
     &.--vert{right:10px;width:105px;}
 }
 
@@ -407,7 +446,7 @@ body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
     height:auto;
     &.--profile{border-radius:37px;}
     &.--class-intro{border-radius:25px;width:355px}
-    &.--menu{border-radius:25px;display:flex;flex-direction:column;}
+    &.--menu{border-radius:15px;display:flex;flex-direction:column;padding:10px;}
     &.--vert{border-radius:15px;display:flex;flex-direction:column;padding:10px;}
 }
 

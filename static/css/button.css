@@ -297,3 +297,40 @@ button{cursor:pointer;border:0;color:black}
     background-color:transparent;
     border:transparent;
 }
+
+.unfocus_num{
+    width:25px;
+    height: 25px;
+    border-radius:13px;
+    margin:0 5px 0 5px;
+    background-color:rgb(225,225,225);
+    transition:all 0.2s ease;
+    &:hover{
+        width: 31px;
+        height: 31px;
+        margin:0 2px 0 2px;
+    }
+}
+.focus_num{
+    width:30px;
+    height:30px;
+    border-radius:15px;
+    margin:0 5px 0 5px;
+    background-color:rgb(240, 160, 5);
+}
+
+.small_circle{
+    width:30px;
+    height:30px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background-color:transparent;
+}
+
+.transparent-btn{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background-color:transparent;
+}

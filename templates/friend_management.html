@@ -21,6 +21,13 @@
         </header>
         <div class="content">
             <div style="height: 110px"></div>
+            <div style="position:relative;display:inline-block;width:100%;justify-content:center;display:flex;">
+                <input type="text" style="height:40px;border-radius:10px;background-color:rgb(175,175,175);width:80%;margin-bottom:20px;">
+                <div style="position:absolute;height:100px;width:100px;z-index:1000;background-color: blueviolet;">
+
+                </div>
+                
+            </div>
             <div class="main-content">
                 <div class="board-list-card --friend-main">
                     <div class="friend-main_profile">
@@ -43,7 +50,7 @@
                             <h2 class="no-margin">{{send_list | length}}</h2>
                         </div>
                     </div>
-                </div>
+                </div>    <!--친구 목록 스크롤 가능하게-->
                 <div class="board-list-card --friend-tab --rt">
                     <div class="friend-tab_label"><h3>친구요청</h3></div>
                     <div class="friend-tab_content --request">

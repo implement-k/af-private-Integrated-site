@@ -17,17 +17,23 @@ const closeModal = () => {
 };
 
 
-const likeClass = (class_id, isLiked) => {
-    let result;
+const likeClass = (isLiked) => {
+    let parts = location.href.split('&');
     let link;
+    let class_id = parts[1];
+
+    const setIconFill = (isFill, class_id) => {
+        let fill = isFill ? '1' : '0';
+        $('#star').css("font-variation-settings","'FILL' "+ fill + ",'wght' 400,'GRAD' -25,'opsz' 24");
+        $('#class_like').attr("onclick","likeClass('" + class_id + "','" + fill + "')");
+    };
+
     if (isLiked === '0') {
         link = '/likeClass/1';  //1 => add
-        $('#star').css("font-variation-settings","'FILL' 1,'wght' 400,'GRAD' -25,'opsz' 24");
-        $('#class_like').attr("onclick","likeClass('"+class_id+"','1')");
+        setIconFill(true, class_id);
     } else {
         link = '/likeClass/0';  //0 => delete
-        $('#star').css("font-variation-settings","'FILL' 0,'wght' 400,'GRAD' -25,'opsz' 24");
-        $('#class_like').attr("onclick","likeClass('"+class_id+"','0')");
+        setIconFill(false, class_id);
     };                  
 
     $.ajax({
@@ -36,62 +42,42 @@ const likeClass = (class_id, isLiked) => {
         data: {'classID': class_id},
         success : function(result) {
             if (result === 'fail') {
-                if (isLiked === '0') {
-                    $('#star').css("font-variation-settings","'FILL' 0,'wght' 400,'GRAD' -25,'opsz' 24");
-                    $('#class_like').attr("onclick","likeClass('"+class_id+"','0')");
-                } else {
-                    $('#star').css("font-variation-settings","'FILL' 1,'wght' 400,'GRAD' -25,'opsz' 24");
-                    $('#class_like').attr("onclick","likeClass('"+class_id+"','1')");
-                };
-                showCancelModal("3개 까지만 가능합니다.")
+                if (isLiked === '0') setIconFill(false, class_id);
+                else setIconFill(true, class_id);
+                showCancelModal("3개 까지만 가능합니다.");
             } else if (result != 'success') {
-                if (isLiked === '0') {
-                    $('#star').css("font-variation-settings","'FILL' 0,'wght' 400,'GRAD' -25,'opsz' 24");
-                    $('#class_like').attr("onclick","likeClass('"+class_id+"','0')");
-                } else {
-                    $('#star').css("font-variation-settings","'FILL' 1,'wght' 400,'GRAD' -25,'opsz' 24");
-                    $('#class_like').attr("onclick","likeClass('"+class_id+"','1')");
-                };
+                if (isLiked === '0') setIconFill(false, class_id);
+                else setIconFill(true, class_id);
                 showCancelModal(result);
-            }; 
+            }
         },
         error : function(request, status, error) {
-            if (isLiked === '0') {
-                $('#star').css("font-variation-settings","'FILL' 0,'wght' 400,'GRAD' -25,'opsz' 24");
-                $('#class_like').attr("onclick","likeClass('"+class_id+"','0')");
-            } else {
-                $('#star').css("font-variation-settings","'FILL' 1,'wght' 400,'GRAD' -25,'opsz' 24");
-                $('#class_like').attr("onclick","likeClass('"+class_id+"','1')");
-            };
+            if (isLiked === '0') setIconFill(false, class_id);
+            else setIconFill(true, class_id);
             showCancelModal('오류');
         }
     });
-    
-    
 };
 
 
-const isLiked = (x) => {if (x === '1') {$('#star').css("font-variation-settings","'FILL' 1,'wght' 400,'GRAD' -25,'opsz' 24")};};
+const isLiked = (x) => {
+    if (x === '1') $('#star').css("font-variation-settings","'FILL' 1,'wght' 400,'GRAD' -25,'opsz' 24");
+};
 
 
 let pid;
-let puid;
-let ptitle;
-let pcontent;
-let pfavorite;
 
 
-const showPost = (link, post_id, post_uid, post_title, post_content, post_favorite) => {
-    if (link!='') {history.pushState(null, null, link);};
+const showPost = (link, post_id, post_uid, post_title, post_content, post_favorite, user_id) => {
+    changeLink(post_id);
     $('#modal-title').text(post_title);
     $('#modal-favorite').text(post_favorite);
     $('#modal-content').html(post_content);
     $('#modal-user').text(post_uid);
-    $('#post').css("visibility","visible");
-    $('#post').css("opacity","1");
+    $('#post').css({visibility:'visible', opacity:'1'});
     $('#dimlayer_comment').css("visibility","visible");
     if ($(".btn"+post_id).attr("id") != 'like_btn') {
-        $('.modal-like').attr({id:'unlike_btn',onclick:'m_unfavorite()'});
+        $('.modal-like').attr({id:'unlike_btn', onclick:'m_unfavorite()'});
         $('.modal-icon').attr('id','unlike_icon');
     } else {
         $('.modal-like').attr({id:'like_btn',onclick:'m_favorite()'});
@@ -99,56 +85,95 @@ const showPost = (link, post_id, post_uid, post_title, post_content, post_favori
     }
     $('.modal-num').text($('#like_num'+post_id).text());
     pid = post_id;
-
-    showComment(post_id)
+    
+    let menuHtml;
+    if (post_uid === user_id) {
+        menuHtml = `
+            <a class="vert-menu" onclick="showModal('edit', '${post_id}')">
+                <span class="material-symbols-rounded">edit</span>
+                <span>수정</span>
+            </a>
+            <a class="vert-menu" onclick="showModal('del', '${post_id}')">
+                <span class="material-symbols-rounded">close</span>
+                <span>삭제</span>
+            </a>
+        `
+    } else {
+        menuHtml = `
+        <a class="vert-menu" onclick="declarePost('${post_id}', 0)">
+            <span class="material-symbols-rounded">brightness_alert</span>
+            <span>신고</span>
+        </a>
+        `
+    }
+    $('#post-modal_menu').html(menuHtml);                                   
+    showComment(post_id);
 };
 
 const showComment = (post_id) => {
-    var commentHtml = '';
-    var comment_card1 = '<div class="comment-card" id="comment-card"><div class="comment-card_user">';
-    comment_card1 += '<img class="profile-img --small" src="/static/image/default_profile.jpg">';
-    comment_card1 += '<div class="comment-card_user_info"><p class="comment-card-p">';
-    var comment_card2 = '</p><p class="comment-card-p --date">';
-    var comment_card3 = '</p></div></div><div class="comment-card_content"><p class="content-p">';
-    var vert1 = '<div class="dropdown-click" id="show_vert'
-    var vert2 = '" onclick="showVert('
-    var vert3 = ')"><button class="small-icon"><span class="material-symbols-rounded vert">more_vert</span></button>'
-    vert3 += '<div class="dropdown__list --vert" id="vert_menu'
-    var vert4 = '"><div style="height:10px;"></div><div class="dropdown__list_content --vert">'
-    var vert5 = '<div class="vert-menu" onclick="editComment('
-    var vert6 = ')"><span class="material-symbols-rounded" style="font-size:20px;">edit</span><p style="margin:0 3px 0 0">수정하기</p></div><div class="vert-menu" onclick="deleteComment(';
-    var vert7 = ')"><span class="material-symbols-rounded" style="font-size:20px;">'
-    vert7 += 'close</span><p style="margin:0 3px 0 0">삭제하기</p></div></div></div></div>'
-    var vert8 = '<div class="vert-menu" onclick="declarePost('
-    var vert9 = ',0)"><span class="material-symbols-rounded" style="font-size:20px;">brightness_alert</span><p style="margin:0 3px 0 0">'
-    vert9 += '신고하기</p></div></div></div></div>'
-
     $.ajax({
         type: "POST",
         url: '/getComment/'+post_id+'&0',
         success : function(result) {
-            uid = result[result.length-1];
+            let uid = result[result.length - 1];
+            let fragment = document.createDocumentFragment();
+
             if (result.length === 1) {
-                if (uid) {$('.post-modal_comment__view').html('<div class="view-loading">첫 댓글을 달아보세요.</div>');}
-                else {$('.post-modal_comment__view').html('<div class="view-loading">로그인하여 첫 댓글을 달아보세요.</div>');}
+                let msg = uid ? '첫 댓글을 달아보세요.' : '로그인하여 첫 댓글을 달아보세요.';
+                $('.post-modal_comment__view').html('<div class="view-loading">'+ msg +'</div>');
             } else {
-                for (i = 0;i < result.length-1;i++){
-                    let id = result[i][0];
-                    commentHtml += comment_card1 + result[i][2] + comment_card2 + result[i][3] + comment_card3 + result[i][4] + '</p>';
-                    commentHtml += vert1 + id + vert2 + id + vert3 + id + vert4;
-                    if (result[i][2] === uid){
-                        commentHtml += vert5 + id + vert6 + id + vert7;
+                result.slice(0,-1).forEach(comment => {
+                    let [id, cmt_class, replies, username, date, content] = comment;
+                    let commentHtml = `
+                        <div class="comment-card" id="comment-card">
+                            <div class="comment-card_user" onclick="location.href='/user/${username}&1'">
+                                <img class="profile-img --small" src="/static/image/default_profile.jpg">
+                                <div class="comment-card_user_info">
+                                    <p class="comment-card-p">${username}</p>
+                                    <p class="comment-card-p --date">${date}</p>
+                                </div>
+                            </div>
+                            <div class="comment-card_content">
+                                <div id="comment-content">
+                                    <p class="content-p" onclick="createReply(${id},'${username}')">${content}</p>
+                                </div>
+                                <div class="dropdown-click" id="show_vert${id}" onclick="showVert(${id})">
+                                    <button class="small-icon"><span class="material-symbols-rounded vert">more_vert</span></button>
+                                    <div class="dropdown__list --vert" id="vert_menu${id}">
+                                        <div style="height:10px;"></div>
+                                        <div class="dropdown__list_content --vert">
+                    `;
+                    
+                    if (username === uid){
+                        commentHtml += ` 
+                            <div class="vert-menu" onclick="editComment(${id})">
+                                <span class="material-symbols-rounded" style="font-size:20px;">edit</span>
+                                <p style="margin:0 3px 0 0">수정하기</p>
+                            </div>
+                            <div class="vert-menu" onclick="deleteComment(${id})">
+                                <span class="material-symbols-rounded" style="font-size:20px;">close</span>
+                                <p style="margin:0 3px 0 0">삭제하기</p>
+                            </div>
+                        `;
                     } else {
-                        commentHtml += vert8 + id + vert9;
+                        commentHtml += ` 
+                            <div class="vert-menu" onclick="declarePost(${id},0)">
+                                <span class="material-symbols-rounded" style="font-size:20px;">brightness_alert</span>
+                                <p style="margin:0 3px 0 0">신고하기</p>
+                            </div>
+                        `;
                     }
-                    commentHtml += '</div>';           
-                    if (result[i][1] > 0) {
+
+                    commentHtml += '</div></div></div></div>';  //<div class="comment-card_content">
+
+                    if (replies > 0) {
                         commentHtml += '<div class="reply"></div>';
-                        commentHtml += '<button class="comment-more" onclick="showReply('+id+')">―― 답글 '+result[i][1]+'개 보기</button>';
+                        commentHtml += `<button class="comment-more" onclick="showReply(${id})">―― 답글 ${replies}개 보기</button>`;
                     };
                     commentHtml += '</div>';
-                };
-                $('.post-modal_comment__view').html(commentHtml);
+                    $(fragment).append(commentHtml);
+                });
+                $('.post-modal_comment__view').html(fragment);
             }
         },
         error : function(request, status, error) {
@@ -158,25 +183,34 @@ const showComment = (post_id) => {
 }
 
 
-const isPost = (post_id, post_uid, post_title, post_content, post_favorite) => {
-    pid = post_id
-    puid = post_uid;
-    ptitle = post_title;
-    pcontent = post_content;
-    pfavorite = post_favorite;
-};
-
-
-const preshowPost = () => {
-    showPost('',pid,puid,ptitle,pcontent,pfavorite)
+const preshowPost = (post_id, post_uid, post_title, post_content, post_favorite, user_id) => {
+    if (post_id != 'None') {
+        showPost('', post_id, post_uid, post_title, post_content.replace(/&lt;br&gt;/g,'<br>'), post_favorite, user_id);
+    } else {
+        showCancelModal('삭제된 게시물입니다.');
+        changeLink(0);
+    }
 }
 
 
-const closePost = (class_id, class_name) => {
-    history.pushState(null, null, '/board/1&'+class_id+'&'+class_name+'&0');
+const editComment = (cmt_id) => {
+    // <div id="comment-content">
+    //                                 <p class="content-p" onclick="createReply(${id},'${username}')">${content}</p>
+    //                             </div>
+    // 해당 id에 해당하는 댓글 p -> input
+    
+}
+
+
+const isPost = (post_id) => {pid = post_id};
+
+
+const closePost = () => {
+    changeLink(0);
     $('#post').css("visibility","hidden");
     $('#post').css("opacity","0");
     $('#dimlayer_comment').css("visibility","hidden");
+    closeReply()
     $('.post-modal_comment__view').html('<div class="view-loading">로딩중</div>');
 };
 
@@ -307,10 +341,8 @@ const m_unfavorite = () => {
 }
 
 let c = '';
-let cid;
-let cname;
 
-const showModal = (cmd, post_id, class_id, class_name) => {
+const showModal = (cmd, post_id) => {
     c = cmd;
     $('#yn').css("visibility","visible");
     $('#dimlayer').css("visibility","visible");
@@ -319,8 +351,6 @@ const showModal = (cmd, post_id, class_id, class_name) => {
     else {s = "삭제" + s};
     $('.modal-p').text(s);
     pid = post_id;
-    cid = class_id;
-    cname = class_name;
 };
 
 const execute = () => {
@@ -332,37 +362,49 @@ const execute = () => {
         localStorage.setItem("title", title);
         localStorage.setItem("content", content);
         localStorage.setItem("post_id", pid);
-        location.href = '/board/2&'+cid+'&'+cname+'&0';
+        let parts = location.href.split('&');
+        location.href = '/board/2&' + parts[1] + '&' + parts[2] + '&0';
     } else {
         $('#yn').css("visibility","hidden");
         $('#dimlayer').css("visibility","hidden");
-        let r = '';
         $.ajax({
             type: "POST",
             url: '/deletePost/'+pid,    //0 => delete
-            async: false,
-            success : function(result) {r = result;},
-            error : function(request, status, error) {r = error;}
+            success : function(result) {
+                if (result === 'success') {
+                    let parts = location.href.split('?');
+                    let url = parts[0];
+                    let arg = parts[1] ? '?' + parts[1] : '';
+                    parts = url.split('&');
+                    parts[3] = 0;
+                    url = parts.join('&');
+                    location.href = url + arg;
+                } else {
+                    showCancelModal(result);
+                }
+                
+            },
+            error : function(request, status, error) {
+                showCancelModal('오류');
+            }
         });
-        if (r === 'f') {alert('error')}
-        else{location.reload();};
     };
 }
 
-const bookmark = (post_id) => {
-    if (post_id === 'none') {post_id = pid};
+// const bookmark = (post_id) => {
+//     if (post_id === 'none') {post_id = pid};
 
-    $.ajax({
-        type: "POST",
-        url: '/bookmarkPost/'+post_id,
-        success : function(result) {
-            if (result === 'success'){showCancelModal("저장했습니다.");}
-            else if (result === 'fail') {showCancelModal("이미 저장한 글입니다.");}
-            else {showCancelModal(result);};
-        },
-        error : function(request, status, error) {showCancelModal("오류");}
-    });
-};
+//     $.ajax({
+//         type: "POST",
+//         url: '/bookmarkPost/'+post_id,
+//         success : function(result) {
+//             if (result === 'success'){showCancelModal("저장했습니다.");}
+//             else if (result === 'fail') {showCancelModal("이미 저장한 글입니다.");}
+//             else {showCancelModal(result);};
+//         },
+//         error : function(request, status, error) {showCancelModal("오류");}
+//     });
+// };
 
 const addComment = () => {
     let comment = $('#comment-input').val();
@@ -397,19 +439,18 @@ const showReply = (comment_id) => {
 }
 
 const showVert = (cmt_id) => {
-    $('#vert_menu'+cmt_id).css({opacity:1,visibility:'visible'})
-    $('#show_vert'+cmt_id).attr("onclick","hideVert('"+cmt_id+"')")
-}
-
-const hideVert = (cmt_id) => {
-    $('#vert_menu'+cmt_id).css({opacity:0,visibility:'hidden'})
-    $('#show_vert'+cmt_id).attr("onclick","showVert('"+cmt_id+"')")
-}
+    $('#vert_menu'+cmt_id).css({opacity:1, visibility:'visible'});
+    const clickHandler = (event) => {
+        if($(event.target).closest('#show_vert'+cmt_id).length === 0) {
+            $('#vert_menu'+cmt_id).css({opacity: 0, visibility: 'hidden'});
+            document.removeEventListener('click', clickHandler);
+        }
+    };
+    document.addEventListener('click', clickHandler);
+};
 
 const replaceEnter = (post_id,content) => {
-    // ct = content
     ct = content.replace(/&lt;br&gt;/g,'<br>')
-    // ct = content.split('&lt;br&gt;').join("\r\n");
     $('#content'+post_id).html(ct)
 }
 
@@ -422,6 +463,29 @@ const declarePost = (cmt_id, isPost) => {
     });
 }
 
-const editComment = (cmt_id) => {
-    
+
+const goPage = (page) => {
+    let urlObj = new URL(location.href);
+    urlObj.searchParams.set('page', page); 
+    window.location.href = urlObj.toString();
+}
+
+const createReply = (cmt_id, user_id) => {
+    $('#reply-card').css({visibility:'visible', height:'auto', padding:'10px'});
+    $('#reply-head').text(user_id + '님 답글 달기')
+}
+
+const closeReply = () => {
+    $('#reply-card').css({visibility:'hidden', height:0,padding:0});
+}
+
+
+const changeLink = (post_id) => {
+    let parts = location.href.split('?');
+    let url = parts[0];
+    let arg = parts[1] ? '?' + parts[1] : '';
+    parts = url.split('&');
+    parts[3] = post_id;
+    url = parts.join('&');
+    history.pushState(null, null, url + arg);
 }

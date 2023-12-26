@@ -21,10 +21,12 @@
         </section>
         <section class="modal --post" id="post">
             <div class="post-modal_content">
-                <div>
+                <div style="flex:1">
                     <div class="post-modal_content_title">
                         <h1 class="modal-title" id="modal-title">제목</h1>
-                        <button class="middle-round --close" onclick="closePost('{{class_info[0]}}','{{class_info[1]}}')"><span class="material-symbols-rounded">close</span></button>
+                        <button class="middle-round --close" onclick="closePost('{{class_info.id}}','{{class_info.name}}')">
+                            <span class="material-symbols-rounded">close</span>
+                        </button>
                     </div>
                     <button class="small-round" onclick="location.href = '/user/'+$('#user'+pid).text()+'&1';">
                         <!--TODO 사용자 계정 사진-->
@@ -34,7 +36,7 @@
                     <p class="modal-content" id="modal-content">내용</p>
                 </div>
                 <div class="post-modal_content_buttons --section">
-                    {% if user_info[0] %}
+                    {% if user_info.id %}
                     <div class="post-modal_content_buttons">
                         <button class="small-round-response --big-favorite modal-like" id="like_btn" onclick="m_favorite()">
                             <span class="material-symbols-rounded modal-icon" id="like_icon">favorite</span>
@@ -45,14 +47,12 @@
                     {%endif%}
                     <div class="nav-main__dropdown">
                         <div class="dropdown__list --menu">
-                            <div class="dropdown__list_content --menu">
-                                <a><span class="material-symbols-rounded">brightness_alert</span>신고하기</a>
-                                <a><span class="material-symbols-rounded">edit</span>수정하기</a>
-                                <a><span class="material-symbols-rounded">close</span>삭제하기</a>
-                            </div>
+                            <div class="dropdown__list_content --menu" id="post-modal_menu"></div>
                             <div style="height:10px;"></div>
                         </div>
-                        <button class="small-round-response --big-icon-circle --dropdown"><span class="material-symbols-rounded">menu</span></button>
+                        <button class="small-round-response --big-icon-circle --dropdown">
+                            <span class="material-symbols-rounded">menu</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -61,10 +61,20 @@
                 <div class="post-modal_comment__view">
                     <div class="view-loading">로딩중</div>
                 </div>
-                {% if user_info[0] %}
-                <div class="post-modal_comment__write">  
-                    <input type="text" class="post-modal_comment__input" id="comment-input" placeholder="댓글 달기">
-                    <button class="small-round-response --comment-add" onclick="addComment()"><span class="material-symbols-rounded" style="color:rgb(245,245,245)">add</span></button>
+                {% if user_info.id %}
+                <div>
+                    <div class="post-modal_comment_reply" id="reply-card">
+                        <p class="no-margin" id="reply-head">대댓글</p>
+                        <button class="transparent-btn" onclick="closeReply()">
+                            <span class="material-symbols-rounded" style="font-size:20px;">cancel</span>
+                        </button>
+                    </div>
+                    <div class="post-modal_comment__write">
+                        <input type="text" class="post-modal_comment__input" id="comment-input" placeholder="댓글 달기">
+                        <button class="small-round-response --comment-add" onclick="addComment()">
+                            <span class="material-symbols-rounded" style="color:rgb(245,245,245)">add</span>
+                        </button>
+                    </div>
                 </div>
                 {%endif%}
             </div>
@@ -77,21 +87,21 @@
                 </button>
                 <nav>
                     <div class="nav-main__dropdown">
-                        <button class="middle-round --label">{{class_info[1]}}</button>
+                        <button class="middle-round --label">{{class_info.name}}</button>
                         <div class="dropdown__list">
                             <div style="height:15px;"></div>
                             <div class="dropdown__list_content --class-intro">
-                                <p class="class_info-p">{{class_info[2]}}</p>
+                                <p class="class_info-p">{{class_info.intro}}</p>
                             </div>
                         </div>
                     </div>
-                    {% if user_info[0] %}
+                    {% if user_info.id %}
                     <button class="middle-round --main" onclick="location.href='/calender'">캘린더</button>
                     <button class="middle-round --main" onclick="location.href='/friend/management'">친구관리</button>
                     {% endif %}
                 </nav>
             </div>
-            {% if user_info[0] %}
+            {% if user_info.id %}
             {% include "dropdown.html" %}
             {% else %}
                 <button class="middle-round --login" onclick="location.href='/login'">로그인</button>
@@ -101,7 +111,7 @@
             <div style="height: 110px"></div>
             {%for post in post_list%}
             {%if post[0] == post_id%}
-            <script>isPost('{{post[0]}}','{{post[1]}}','{{post[2]}}','{{post[3]}}','{{post[5]}}')</script>
+            <script>isPost('{{post[0]}}', '{{post[5]}}')</script>
             {%endif%}
             <div class="post-card">
                 <div class="post-card_action">
@@ -113,10 +123,14 @@
                             <p class="small-font" id="user{{post[0]}}">{{post[1]}}</p> 
                         </button>
                     </div>
-                    {% if user_info[0] == post[1] %}
+                    {% if user_info.id == post[1] %}
                     <div class="post-card_action">
-                        <button class="small-round-border --edit" title="수정하기" onclick="showModal('edit','{{post[0]}}','{{class_info[0]}}','{{class_info[1]}}')"><span class="material-symbols-rounded">edit</span></button> 
-                        <button class="small-round-border --delete" title="삭제하기" onclick="showModal('del','{{post[0]}}')"><span class="material-symbols-rounded">close</span></button>
+                        <button class="small-round-border --edit" title="수정하기" onclick="showModal('edit','{{post[0]}}')">
+                            <span class="material-symbols-rounded">edit</span>
+                        </button> 
+                        <button class="small-round-border --delete" title="삭제하기" onclick="showModal('del','{{post[0]}}')">
+                            <span class="material-symbols-rounded">close</span>
+                        </button>
                     </div>
                     {% endif %}
                 </div>
@@ -124,7 +138,7 @@
                 <script>replaceEnter('{{post[0]}}','{{post[3]}}')</script>
                 <div class="post-card_action --bottom">
                     <div class="post-card_action">
-                        {% if user_info[0] %}
+                        {% if user_info.id %}
                         {%if not post[6] == None%}
                         <button class="small-round-response --favorite btn{{post[0]}}" id="unlike_btn" onclick="unfavorite('{{post[0]}}')">
                             <span class="material-symbols-rounded icon{{post[0]}}" id="unlike_icon">favorite</span>
@@ -141,27 +155,54 @@
                         {% endif %}
                         <p class="small-font --date">{{post[4]}}</p>
                     </div>
-                    <button class="small-round-response --icon-circle" onclick="showPost('/board/1&{{class_info[0]}}&{{class_info[1]}}&{{post[0]}}','{{post[0]}}','{{post[1]}}','{{post[2]}}','{{post[3]}}','{{post[5]}}')"><span class="material-symbols-rounded">forum</span></button>
+                    <button class="small-round-response --icon-circle" onclick="showPost('/board/1&{{class_info.id}}&{{class_info.name}}&{{post[0]}}','{{post[0]}}','{{post[1]}}','{{post[2]}}','{{post[3]}}','{{post[5]}}','{{user_info.id}}')"><span class="material-symbols-rounded">forum</span></button>
                 </div>
             </div>
             {%endfor%}
-            <div style="height: 110px"></div>
-            <!-- TODO 페이징 구현 -->
+            <div class="pagination">
+                {%if pagination[1] > 10%}
+                <button class="small_circle" onclick="goPage((Number('{{pagination[1]}}')-1).toString())">
+                    <span class="material-symbols-rounded nav_arrow">navigate_before</span>
+                </button>
+                {%endif%}
+                {%for i in range(pagination[1], pagination[2]+1)%}
+                {%if i == pagination[0]%}
+                <button class="focus_num" onclick="goPage('{{i}}')">{{i}}</button>
+                {%else%}
+                <button class="unfocus_num" onclick="goPage('{{i}}')">{{i}}</button>
+                {%endif%}
+                {%endfor%}
+                {%if pagination[3] >= pagination[1] + 10%}
+                <button class="small_circle" onclick="goPage((Number('{{pagination[2]}}')+1).toString())">
+                    <span class="material-symbols-rounded nav_arrow">navigate_next</span>
+                </button>
+                {%endif%}
+            </div>
         </section>
-        {% if user_info[0] %}
+        {% if user_info.id %}
         <footer class="post-function --section">
             <div class="post-function">
-                <button class="circle --board" id="class_like" onclick="likeClass('{{class_info[0]}}','{{isLiked}}')"><span class="material-symbols-rounded star" id="star">kid_star</span></button>
+                <button class="circle --board" id="class_like" onclick="likeClass('{{isLiked}}')"><span class="material-symbols-rounded star" id="star">kid_star</span></button>
                 <!-- <button class="circle --board"><span class="material-symbols-rounded">search</span></button> -->
-                <button class="circle --board" id="add" onclick="location.href='/board/0&{{class_info[0]}}&{{class_info[1]}}&0'"><span class="material-symbols-rounded">add</span></button>
+                <button class="circle --board" id="add" onclick="location.href='/board/0&{{class_info.id}}&{{class_info.name}}&0'"><span class="material-symbols-rounded">add</span></button>
             </div>
             <script>isLiked('{{isLiked}}')</script>
         </footer>
         {% endif %}
-        <button class="dimlayer --comment" id="dimlayer_comment" onclick="closePost('{{class_info[0]}}','{{class_info[1]}}')"></button>
+        <button class="dimlayer --comment" id="dimlayer_comment" onclick="closePost()"></button>
         <div class="dimlayer" id="dimlayer"></div>
         {%if post_id != 0%}
-        <script>preshowPost()</script>
+        <script>
+            preshowPost(
+                '{{post_info.id}}',
+                '{{post_info.user_id}}',
+                '{{post_info.title}}',
+                '{{post_info.content}}',
+                '{{post_info.created}}',
+                '{{post_info.like}}',
+                '{{user_info.id}}'
+            );
+        </script>
         {%endif%}
     </body>
 </html>

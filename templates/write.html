@@ -12,7 +12,7 @@
             <span class="material-symbols-rounded" style="font-size:40px">error</span>
             <p class="modal-p">글 작성을 중지하시겠습니까?</p>
             <button class="middle-round --login" onclick="closeModal()">아니요</button>
-            <button class="middle-round --yes" onclick="goPage('{{class_info[0]}}','{{class_info[1]}}')">예</button>
+            <button class="middle-round --yes" onclick="goPage('{{class_id}}','{{class_name}}')">예</button>
         </section>
         <section class="modal" id="cancel">
             <span class="material-symbols-rounded" style="font-size:40px">error</span>
@@ -27,7 +27,7 @@
                         <h1 class="main-title">병사 통합 홈페이지</h1>
                     </button>
                     <nav>
-                        <button class="middle-round --label" id="class_name">{{class_info[1]}}</button>
+                        <button class="middle-round --label" id="class_name">{{class_name}}</button>
                         <button class="middle-round --main" onclick="showModal('/calender')">캘린더</button>
                         <button class="middle-round --main" onclick="showModal('/friend/management')">친구관리</button>
                     </nav>
@@ -36,30 +36,28 @@
             </header>
             <sction class="content">
                 <div style="height: 110px"></div>
-                    {%if isEdit == '0'%}
-                    <h1 class="write-h1">글작성</h1>
-                    {%else%}
+                    {%if isEdit%}
                     <h1 class="write-h1">글수정</h1>
+                    {%else%}
+                    <h1 class="write-h1">글작성</h1>
                     {%endif%}
                     <input type="text" class="write-text --title" id="title" placeholder="제목을 입력해주세요"><br>
                     <textarea class="write-text --content" id="content" placeholder="주의사항&#13*군대 내 훈련/보안사항에 대해서 주의해 주세요.&#13*군부대 정확한 위치를 밝히지 마세요.&#13*보안 위반 책임은 본인에게 있습니다."></textarea>
                     <div class="main-section">
                         <div>
                             <button type="button" class="large-round --back" onclick="showModal('back')">이전</button>
-                            {%if isEdit == '0'%}
-                            <button type="button" class="large-round --write" onclick="showModal('create')">게시물 쓰기</button>
-                            {%else%}
+                            {%if isEdit%}
                             <button type="button" class="large-round --write" onclick="showModal('edit')">게시물 수정</button>
+                            {%else%}
+                            <button type="button" class="large-round --write" onclick="showModal('create')">게시물 쓰기</button>
                             {%endif%}
                         </div>
                 </div>
             </sction>
         </div>
         <div class="dimlayer"></div>
-        {%if isEdit == '1'%}
+        {%if isEdit%}
         <script>isEdit()</script>
-        {%else%}
-        <!-- TODO 링크의 mode가 2라면 잘못된 페이지 -->
         {%endif%}
     </body>
 </html>

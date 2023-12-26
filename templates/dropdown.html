@@ -5,9 +5,9 @@
     <div class="dropdown__list --profile">
         <div style="height:10px;"></div>
         <div class="dropdown__list_content --profile">
-            <button class="board-list-card --user" onclick="location.href='/user/{{user_info[0]}}&0'">
-                <h1 style="margin-top:10px;margin-bottom:6px">{{user_info[0]}}</h1>
-                <p class="margin-top-remove">{{user_info[1]}}</p>
+            <button class="board-list-card --user" onclick="location.href='/user/{{user_info.id}}&0'">
+                <h1 style="margin-top:10px;margin-bottom:6px">{{user_info.id}}</h1>
+                <p class="margin-top-remove">{{user_info.intro}}</p>
             </button>
             <!-- <a href="/userPost/0">저장한 글</a><br>
             <a class="a-margin-top-add" href="/userPost/1">내가 작성한 글</a> -->
