@@ -174,16 +174,25 @@ def board(mode, class_id, class_name, post_id):    #mode 0: 글작성, mode 1: �
 @app.route('/',methods=['POST', 'GET'])
 def home():
     user_id = session.get('id', None)
+
     if user_id:
         user_intro = session.get('user_intro', None)
-        if not user_intro: user_intro="자기소개가 없습니다."
-        user_info = [user_id, user_intro]
-                
-        result = db(True, ["SELECT * FROM post_class","SELECT l_cid, c_name FROM liked_class, post_class WHERE liked_class.l_cid = post_class.c_id and l_uid='{0}'".format(user_id)])
-        class_list = result[0]
-        liked_class_list = result[1]
+        if not user_intro: user_intro = "자기소개가 없습니다."
+
+        sql = [
+            "SELECT * FROM post_class",
+            "SELECT l_cid, c_name FROM liked_class, post_class WHERE liked_class.l_cid = post_class.c_id and l_uid='{0}'".format(user_id),
+            "SELECT f_toid,f_friend FROM friend WHERE f_fromid='{0}' AND f_friend=1".format(user_id)
+        ]
+        result = db(True, sql)
             
-        return render_template('home.html', class_list=class_list, liked_class_list=liked_class_list, user_info=user_info)
+        return render_template(
+            'home.html',
+            user_info = {'id':user_id, 'intro':user_intro},
+            class_list = result[0],
+            liked_class_list = result[1],
+            friend_list = result[2]
+        )
     else:
         return redirect('/board/1&1&공군&0')
 
@@ -288,7 +297,13 @@ def createPost(class_id,mode):
 
 @app.route('/deletePost/<int:post_id>', methods=['POST']) 
 def deletePost(post_id):
-    db(False, ["DELETE FROM posts WHERE p_id={0}".format(post_id)])
+    con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+    cur = con.cursor()
+
+    cur.execute("DELETE FROM posts WHERE p_id={0}".format(post_id))
+    cur.execute("DELETE FROM comment WHERE cm_class={0}".format(post_id))
+    con.commit()
+    con.close()
     return 'success'
 
 
@@ -426,41 +441,69 @@ def editFriend(mode,friend_id):
 
 
 @app.route('/getComment/<int:post_id>&<int:mode>',methods=['POST'])
-def getComment(post_id,mode): #mode 0 조회, mode 1 추가, mode 2 수정, mode 3 삭제, mode 4 대댓글 불러오기
+def getComment(post_id,mode): #mode 0 조회, mode 1 추가, mode 2 수정, mode 3 삭제, mode 4 대댓글 불러오기, mode 5 대댓글 삭제
+    user_id = session.get('id',None)
     if mode == 0:
-        user_id = session.get('id',None)
         #0 cm_id, 1 cm_class, 2 cm_group, 3 cm_uid, 4 cm_created, 5 cm_content
-        result = db(True, ["SELECT cm_id,cm_class,cm_group,cm_uid,DATE_FORMAT(cm_created, '%Y-%m-%d %H:%i'),cm_content FROM comment WHERE cm_postID={0} AND cm_group=0".format(post_id)])[0]
-        result = list(result)
+        sql = '''
+            SELECT cm_id,cm_class,cm_group,cm_uid,DATE_FORMAT(cm_created, '%Y-%m-%d %H:%i'),cm_content
+            FROM comment WHERE cm_postID={0} AND cm_class=0
+        '''.format(post_id)
+        result = list(db(True, [sql])[0])
         result.append(user_id)
         return jsonify(result)
     elif mode == 1:
-        cm_class = 0
-        gruop = 0
-        user_id = session.get('id',None)
+        con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+        cur = con.cursor()
+        comment_id = request.form['id']
         comment = request.form['comment']
-        db(False, ["INSERT INTO comment(cm_postID,cm_class,cm_group,cm_uid,cm_created,cm_content) VALUES({0},{1},{2},'{3}',NOW(),'{4}')".format(post_id,cm_class, gruop, user_id, comment)])
+        group = 0
+        sql = '''
+            INSERT INTO comment(cm_postID,cm_class,cm_group,cm_uid,cm_created,cm_content)
+            VALUES({0},{1},{2},'{3}',NOW(),'{4}')
+        '''.format(post_id,comment_id, group, user_id, comment)
+        cur.execute(sql)
+
+        if comment_id != 0:
+            cur.execute('UPDATE comment SET cm_group = cm_group + 1 WHERE cm_id=%s',(comment_id))
+        
+        con.commit()
+        con.close()
         return 'success'
-    # elif mode == 2:
-    #     cm_id = 댓글 id 
-    #     content = 댓글 내용
-    #     db(False, ["UPDATE comment SET cm_content = '{0}' WHERE cm_id={1}".format(content, cm_id)])
-    #     return 'success'
+    elif mode == 2:
+        cm_id = post_id
+        content = request.form['content']
+        db(False, ["UPDATE comment SET cm_content = '{0}' WHERE cm_id={1}".format(content, cm_id)])
+        return user_id
     elif mode == 3:
         db(False, ["DELETE FROM comment WHERE cm_id={0}".format(post_id)])
         return 'success'
-    # else:
-    #     #0 cm_id, 1 cm_uid, 2 cm_created, 3 cm_content
-    #     comment_id = 댓글 id
-    #     result = db(True, ["SELECT cm_id,cm_uid,DATE_FORMAT(cm_created, '%Y-%m-%d %H:%i'),cm_content FROM comment WHERE cm_gruop={1}".format(comment_id)])[0]
-    #     return jsonify(result)
+    elif mode == 4:
+        #0 cm_id, 1 cm_uid, 2 cm_created, 3 cm_content
+        comment_id = post_id
+        sql = "SELECT cm_id,cm_uid,DATE_FORMAT(cm_created, '%Y-%m-%d %H:%i'),cm_content FROM comment WHERE cm_class={0}".format(comment_id)
+        result = list(db(True, [sql])[0])
+        result.append(user_id)
+        return jsonify(result)
+    else:
+        con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+        cur = con.cursor()
+        cur.execute("SELECT cm_class FROM comment WHERE cm_id={0}".format(post_id))
+        comment_id = cur.fetchone()[0]
+        
+        cur.execute("DELETE FROM comment WHERE cm_id={0}".format(post_id))
+        cur.execute('UPDATE comment SET cm_group = cm_group - 1 WHERE cm_id=%s',(comment_id))
+        con.commit()
+        con.close()
+        
+        return 'success'
+
 
 @app.route('/declare/<int:id>&<int:isPost>',methods=['POST'])
 def declare(id,isPost):
     user_id = session.get('id',None)
-    db(False, ["INSERT INTO declare_user(d_isPost,d_cardID,d_uid) VALUES({0},{1},'{2}')".format(isPost,id,user_id)])
+    db(False, ["INSERT INTO declare_user(d_isPost,d_cardID,d_uid) VALUES({0},{1},'{2}')".format(isPost, id, user_id)])
     return 'success'
-
 
 
 app.run(debug=True)

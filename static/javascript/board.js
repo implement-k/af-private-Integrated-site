@@ -134,7 +134,7 @@ const showComment = (post_id) => {
                                 </div>
                             </div>
                             <div class="comment-card_content">
-                                <div id="comment-content">
+                                <div class="comment-card_content_main" id="comment-content${id}">
                                     <p class="content-p" onclick="createReply(${id},'${username}')">${content}</p>
                                 </div>
                                 <div class="dropdown-click" id="show_vert${id}" onclick="showVert(${id})">
@@ -150,7 +150,7 @@ const showComment = (post_id) => {
                                 <span class="material-symbols-rounded" style="font-size:20px;">edit</span>
                                 <p style="margin:0 3px 0 0">수정하기</p>
                             </div>
-                            <div class="vert-menu" onclick="deleteComment(${id})">
+                            <div class="vert-menu" onclick="deleteComment(${id}, false)">
                                 <span class="material-symbols-rounded" style="font-size:20px;">close</span>
                                 <p style="margin:0 3px 0 0">삭제하기</p>
                             </div>
@@ -167,8 +167,8 @@ const showComment = (post_id) => {
                     commentHtml += '</div></div></div></div>';  //<div class="comment-card_content">
 
                     if (replies > 0) {
-                        commentHtml += '<div class="reply"></div>';
-                        commentHtml += `<button class="comment-more" onclick="showReply(${id})">―― 답글 ${replies}개 보기</button>`;
+                        commentHtml += `<div id="reply-section${id}"></div>`;
+                        commentHtml += `<button class="comment-more" onclick="showReply(${id},'')" id="reply-more${id}">―― 답글 ${replies}개 보기</button>`;
                     };
                     commentHtml += '</div>';
                     $(fragment).append(commentHtml);
@@ -194,11 +194,32 @@ const preshowPost = (post_id, post_uid, post_title, post_content, post_favorite,
 
 
 const editComment = (cmt_id) => {
-    // <div id="comment-content">
-    //                                 <p class="content-p" onclick="createReply(${id},'${username}')">${content}</p>
-    //                             </div>
-    // 해당 id에 해당하는 댓글 p -> input
-    
+    editCommentHtml = `
+        <div style="display:flex;margin-top:5px;width:100%">
+            <input class="edit-comment-input" type="text" id="edit-comment-input${cmt_id}">
+            <button class="small-icon-circle" onclick="executeEditComment('${cmt_id}')">수정</button>
+        </div>
+    `
+    $('#comment-content'+cmt_id).html(editCommentHtml);
+}
+
+
+const executeEditComment = (cmt_id) => {
+    content = $('#edit-comment-input'+cmt_id).val()
+    $.ajax({
+        type: "POST",
+        url: '/getComment/'+cmt_id+'&2',
+        data: {'content': content},
+        success : function(result) {
+            let editCommentHtml = `
+                <p class="content-p" onclick="createReply(${cmt_id},'${result}')">${content}</p>
+            `
+            $('#comment-content'+cmt_id).html(editCommentHtml);
+        },
+        error : function(request, status, error) {
+            showCancelModal('댓글오류');
+        }
+    });
 }
 
 
@@ -413,30 +434,109 @@ const addComment = () => {
     $.ajax({
         type: "POST",
         url: '/getComment/'+pid+'&1',
-        data: {'comment':comment},
+        data: {'id':0, 'comment':comment},
         success : function(result) {
-            showComment(pid);
             $('#comment-input').val('');
+            showComment(pid);
         },
         error : function(request, status, error) {showCancelModal("오류");}
     });
 }
 
-const deleteComment = (cmt_id) => {
+
+const deleteComment = (comment_id, isReply) => {
+    let link;
+
+    if (isReply) link = '/getComment/'+comment_id+'&5'
+    else link = '/getComment/'+comment_id+'&3'
+
     $.ajax({
         type: "POST",
-        url: '/getComment/'+cmt_id+'&3',
+        url: link,
         success : function(result) {
-            showCancelModal("삭제했습니다.");
-            showComment(pid)
+            if (result === 'success') {
+                showCancelModal("삭제했습니다.");
+                showComment(pid)
+                if (isReply) showReply(comment_id, '―― 답글 더 보기');
+            } else {
+                showCancelModal('오류');
+            }
         },
         error : function(request, status, error) {showCancelModal("오류");}
     });
 }
 
-const showReply = (comment_id) => {
-    
+
+const showReply = (comment_id, reply_more_html) => {
+    if (reply_more_html !== '―― 답글 더 보기') reply_more_html = $('#reply-more'+comment_id).html();
+    $('#reply-more'+comment_id).html('―― 로딩중');
+    $.ajax({
+        type: "POST",
+        url: '/getComment/'+comment_id+'&4',
+        success : function(result) {
+            let uid = result[result.length - 1];
+            let fragment = document.createDocumentFragment();
+
+            result.slice(0,-1).forEach(reply => {
+                replyHtml = `
+                    <div class="comment-card --reply">
+                        <div class="comment-card_user">
+                            <img class="profile-img --small" src="/static/image/default_profile.jpg">
+                            <div class="comment-card_user_info">
+                                <p class="comment-card-p">${reply[1]}</p>
+                                <p class="comment-card-p --date">${reply[2]}</p>
+                            </div>
+                        </div>
+                        <div class="comment-card_content">
+                                <div class="comment-card_content_main" id="comment-content${reply[0]}">
+                                    <p class="content-p")">${reply[3]}</p>
+                                </div>
+                                <div class="dropdown-click" id="show_vert${reply[0]}" onclick="showVert(${reply[0]})">
+                                    <button class="small-icon"><span class="material-symbols-rounded vert">more_vert</span></button>
+                                    <div class="dropdown__list --vert" id="vert_menu${reply[0]}">
+                                        <div style="height:10px;"></div>
+                                        <div class="dropdown__list_content --vert">
+                `;
+
+                if (reply[1] === uid){
+                    replyHtml += ` 
+                        <div class="vert-menu" onclick="editComment(${reply[0]})">
+                            <span class="material-symbols-rounded" style="font-size:20px;">edit</span>
+                            <p style="margin:0 3px 0 0">수정하기</p>
+                        </div>
+                        <div class="vert-menu" onclick="deleteComment(${reply[0]},true)">
+                            <span class="material-symbols-rounded" style="font-size:20px;">close</span>
+                            <p style="margin:0 3px 0 0">삭제하기</p>
+                        </div>
+                    `;
+                } else {
+                    replyHtml += ` 
+                        <div class="vert-menu" onclick="declarePost(${reply[0]},0)">
+                            <span class="material-symbols-rounded" style="font-size:20px;">brightness_alert</span>
+                            <p style="margin:0 3px 0 0">신고하기</p>
+                        </div>
+                    `;
+                }
+
+                replyHtml += '</div></div></div></div></div>';
+                $(fragment).append(replyHtml);
+            });
+            $('#reply-section'+comment_id).html(fragment);
+            $('#reply-more'+comment_id).attr('onclick','hideReply("'+comment_id+'","'+reply_more_html+'")').html('―― 숨기기');
+        },
+        error : function(request, status, error) {
+            showCancelModal("오류");
+            $('#reply-more'+comment_id).html(reply_more_html);
+        }
+    });
 }
+
+
+const hideReply = (comment_id, original_text) => {
+    $('#reply-section'+comment_id).empty()
+    $('#reply-more'+comment_id).attr('onclick','showReply("'+comment_id+'")').html(original_text);
+}
+
 
 const showVert = (cmt_id) => {
     $('#vert_menu'+cmt_id).css({opacity:1, visibility:'visible'});
@@ -473,6 +573,7 @@ const goPage = (page) => {
 const createReply = (cmt_id, user_id) => {
     $('#reply-card').css({visibility:'visible', height:'auto', padding:'10px'});
     $('#reply-head').text(user_id + '님 답글 달기')
+    $('#comment-input-btn').attr('onclick','addReply("'+cmt_id+'")')
 }
 
 const closeReply = () => {
@@ -488,4 +589,23 @@ const changeLink = (post_id) => {
     parts[3] = post_id;
     url = parts.join('&');
     history.pushState(null, null, url + arg);
+}
+
+
+const addReply = (comment_id) => {
+    let comment = $('#comment-input').val();
+    $('#comment-input').val('로딩중');
+
+    $.ajax({
+        type: "POST",
+        url: '/getComment/'+pid+'&1',
+        data: {'id':comment_id, 'comment':comment},
+        success : function(result) {
+            $('#comment-input').val('');
+            showComment(pid);
+            showReply(comment_id, '―― 답글 더 보기');
+        },
+        error : function(request, status, error) {showCancelModal("오류");}
+    });
+    closeReply();
 }

@@ -71,7 +71,7 @@
                     </div>
                     <div class="post-modal_comment__write">
                         <input type="text" class="post-modal_comment__input" id="comment-input" placeholder="댓글 달기">
-                        <button class="small-round-response --comment-add" onclick="addComment()">
+                        <button class="small-round-response --comment-add" id="comment-input-btn" onclick="addComment()">
                             <span class="material-symbols-rounded" style="color:rgb(245,245,245)">add</span>
                         </button>
                     </div>
@@ -155,7 +155,9 @@
                         {% endif %}
                         <p class="small-font --date">{{post[4]}}</p>
                     </div>
-                    <button class="small-round-response --icon-circle" onclick="showPost('/board/1&{{class_info.id}}&{{class_info.name}}&{{post[0]}}','{{post[0]}}','{{post[1]}}','{{post[2]}}','{{post[3]}}','{{post[5]}}','{{user_info.id}}')"><span class="material-symbols-rounded">forum</span></button>
+                    <button class="small-round-response --icon-circle" onclick="showPost('/board/1&{{class_info.id}}&{{class_info.name}}&{{post[0]}}','{{post[0]}}','{{post[1]}}','{{post[2]}}','{{post[3]}}','{{post[5]}}','{{user_info.id}}')">
+                        <span class="material-symbols-rounded">forum</span>
+                    </button>
                 </div>
             </div>
             {%endfor%}
@@ -182,9 +184,13 @@
         {% if user_info.id %}
         <footer class="post-function --section">
             <div class="post-function">
-                <button class="circle --board" id="class_like" onclick="likeClass('{{isLiked}}')"><span class="material-symbols-rounded star" id="star">kid_star</span></button>
+                <button class="circle --board" id="class_like" onclick="likeClass('{{isLiked}}')">
+                    <span class="material-symbols-rounded star" id="star">kid_star</span>
+                </button>
                 <!-- <button class="circle --board"><span class="material-symbols-rounded">search</span></button> -->
-                <button class="circle --board" id="add" onclick="location.href='/board/0&{{class_info.id}}&{{class_info.name}}&0'"><span class="material-symbols-rounded">add</span></button>
+                <button class="circle --board" id="add" onclick="location.href='/board/0&{{class_info.id}}&{{class_info.name}}&0'">
+                    <span class="material-symbols-rounded">add</span>
+                </button>
             </div>
             <script>isLiked('{{isLiked}}')</script>
         </footer>

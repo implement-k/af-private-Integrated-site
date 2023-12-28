@@ -334,3 +334,16 @@ button{cursor:pointer;border:0;color:black}
     align-items:center;
     background-color:transparent;
 }
+
+.small-icon-circle{
+    margin-left:10px;
+    width:40px;
+    height:20px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:7px;
+    font-size:small;
+    color:rgb(235,235,235);
+    background-color:rgb(28,51,91);
+}
