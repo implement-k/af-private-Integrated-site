@@ -135,7 +135,7 @@ const showComment = (post_id) => {
                             </div>
                             <div class="comment-card_content">
                                 <div class="comment-card_content_main" id="comment-content${id}">
-                                    <p class="content-p" onclick="createReply(${id},'${username}')">${content}</p>
+                                    <p class="content-p" id="comment-p${id}" onclick="createReply(${id},'${username}')">${content}</p>
                                 </div>
                                 <div class="dropdown-click" id="show_vert${id}" onclick="showVert(${id})">
                                     <button class="small-icon"><span class="material-symbols-rounded vert">more_vert</span></button>
@@ -194,6 +194,7 @@ const preshowPost = (post_id, post_uid, post_title, post_content, post_favorite,
 
 
 const editComment = (cmt_id) => {
+    let comment_content = $('#comment-p'+cmt_id).text()
     editCommentHtml = `
         <div style="display:flex;margin-top:5px;width:100%">
             <input class="edit-comment-input" type="text" id="edit-comment-input${cmt_id}">
@@ -201,6 +202,7 @@ const editComment = (cmt_id) => {
         </div>
     `
     $('#comment-content'+cmt_id).html(editCommentHtml);
+    $('#edit-comment-input'+cmt_id).val(comment_content);
 }
 
 
@@ -212,7 +214,7 @@ const executeEditComment = (cmt_id) => {
         data: {'content': content},
         success : function(result) {
             let editCommentHtml = `
-                <p class="content-p" onclick="createReply(${cmt_id},'${result}')">${content}</p>
+                <p class="content-p" id="comment-p${cmt_id}" onclick="createReply(${cmt_id},'${result}')">${content}</p>
             `
             $('#comment-content'+cmt_id).html(editCommentHtml);
         },
@@ -412,20 +414,20 @@ const execute = () => {
     };
 }
 
-// const bookmark = (post_id) => {
-//     if (post_id === 'none') {post_id = pid};
+const bookmark = (post_id) => {
+    if (post_id === 'none') {post_id = pid};
 
-//     $.ajax({
-//         type: "POST",
-//         url: '/bookmarkPost/'+post_id,
-//         success : function(result) {
-//             if (result === 'success'){showCancelModal("저장했습니다.");}
-//             else if (result === 'fail') {showCancelModal("이미 저장한 글입니다.");}
-//             else {showCancelModal(result);};
-//         },
-//         error : function(request, status, error) {showCancelModal("오류");}
-//     });
-// };
+    $.ajax({
+        type: "POST",
+        url: '/bookmarkPost/'+post_id,
+        success : function(result) {
+            if (result === 'success'){showCancelModal("저장했습니다.");}
+            else if (result === 'fail') {showCancelModal("이미 저장한 글입니다.");}
+            else {showCancelModal(result);};
+        },
+        error : function(request, status, error) {showCancelModal("오류");}
+    });
+};
 
 const addComment = () => {
     let comment = $('#comment-input').val();
@@ -489,7 +491,7 @@ const showReply = (comment_id, reply_more_html) => {
                         </div>
                         <div class="comment-card_content">
                                 <div class="comment-card_content_main" id="comment-content${reply[0]}">
-                                    <p class="content-p")">${reply[3]}</p>
+                                    <p class="content-p")" id="comment-p${reply[0]}">${reply[3]}</p>
                                 </div>
                                 <div class="dropdown-click" id="show_vert${reply[0]}" onclick="showVert(${reply[0]})">
                                     <button class="small-icon"><span class="material-symbols-rounded vert">more_vert</span></button>

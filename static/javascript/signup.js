@@ -16,32 +16,29 @@ const is_id_dub = () => {
     } else if (id.length > 20) {
         $('#id').val('').attr("placeholder","20자 이내로 입력해주세요.").css("background-color","rgb(224, 173, 173)");
     } else {
-        var dub = 'e';
         $.ajax({
             type: "POST",
             url: '/isDub',
-            async: false,
             data: {
                 'name':'u_id',
                 'value':id
             },
             success : function(result) {
-                dub = result;
+                if (result === "1") { //아이디 중복일 경우
+                    $('#id').val('').attr("placeholder","중복되는 아이디입니다.").css("background-color","rgb(224, 173, 173)");
+                } else if (result === "e") {
+                    $('#id').val('').attr("placeholder","오류").css("background-color","rgb(224, 173, 173)");
+                }else if (result === 'error'){
+                    $('#id').val('').attr("placeholder","DB오류").css("background-color","rgb(224, 173, 173)");
+                }else{ // 정상적인 아이디
+                    $('#id_dub').attr("disabled",true);
+                    is_id_done = true;
+                }
             },
             error : function(request, status, error) {
-                dub = "e";
+                $('#id').val('').attr("placeholder","오류").css("background-color","rgb(224, 173, 173)");
             }
         });
-        if (dub === "1") { //아이디 중복일 경우
-            $('#id').val('').attr("placeholder","중복되는 아이디입니다.").css("background-color","rgb(224, 173, 173)")
-        } else if (dub === "e") {
-            $('#id').val('').attr("placeholder","오류").css("background-color","rgb(224, 173, 173)")
-        }else if (dub === 'error'){
-            $('#id').val('').attr("placeholder","DB오류").css("background-color","rgb(224, 173, 173)")
-        }else{ // 정상적인 아이디
-            $('#id_dub').attr("disabled",true)
-            is_id_done = true;
-        };
     }
 };
 

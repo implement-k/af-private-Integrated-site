@@ -252,14 +252,42 @@ def privateUser(name, mode):                  #mode 0: 개인, mode 1 남
             
             user_intro = session.get('user_intro', None)
             if not user_intro: user_intro="자기소개가 없습니다."
+            
+            friends = []            #친구
+            friend_reception = []   #친구신청 받은 것
+            friend_request = []     #친구신청 보낸 것
 
-            user_info = [user_id, user_intro]
-            # 미리 보기 5개까지만
-            friend_list=['asd','dfff','df']
-            # friend_list=[]
-            friend_request_list=['fff','12user','fkuser']
-            # friend_request_list=[]
-            return render_template('user.html', user_info=user_info, friend_list=friend_list, friend_request_list=friend_request_list)
+            result = db(True, [
+                "SELECT f_toid,f_friend FROM friend WHERE f_fromid='{0}'".format(user_id),
+                """SELECT posts.p_id, posts.p_title, posts.p_created, posts.p_classification, post_class.c_name
+                FROM saved_post
+                JOIN posts ON saved_post.s_id = posts.p_id
+                JOIN post_class ON posts.p_classification = post_class.c_id
+                WHERE saved_post.s_uid = '{0}'
+                ORDER BY posts.p_created DESC LIMIT 10""".format(user_id),
+                """SELECT p_id,p_title,p_created,p_classification,c_name FROM posts
+                JOIN post_class ON posts.p_classification = post_class.c_id
+                WHERE posts.p_uid = '{0}'
+                ORDER BY posts.p_created DESC LIMIT 10""".format(user_id),
+                ])
+
+            for i in result[0]:
+                if i[1] == 0:
+                    friend_reception.append(i[0])
+                elif i[1] == 1:
+                    friends.append(i[0])
+                else:
+                    friend_request.append(i[0])
+
+            return render_template(
+                'user.html',
+                user_info = {'id':user_id, 'intro':user_intro},
+                friend_list = friends,
+                reception_list = friend_reception,
+                send_list = friend_request,
+                saved_post = result[1],
+                written_post = result[2]
+            )
         else:
             result = db(True, ["SELECT u_intro FROM user WHERE u_id = '{0}'".format(name)])[0]
             user_intro = 'null'
@@ -271,6 +299,72 @@ def privateUser(name, mode):                  #mode 0: 개인, mode 1 남
                 return render_template('friend.html',user_id=name, user_intro=user_intro)
     else:
         return redirect('/login')
+
+
+@app.route('/viewPost/<mode>')
+def viewPost(mode):
+    user_id = session.get('id', None)
+
+    if not user_id: return redirect('/login')
+
+    per_page = 10
+    con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+    cur = con.cursor()
+    title = ''
+
+    if mode == 'bookmark':
+        title = '저장한 글'
+        cur.execute("""
+            SELECT COUNT(*) FROM saved_post
+            JOIN posts ON saved_post.s_id = posts.p_id
+            WHERE saved_post.s_uid = %s""", (user_id)) 
+    else: # 'write'
+        title = '내가 쓴 글'
+        cur.execute("SELECT COUNT(*) FROM posts WHERE p_uid = %s", (user_id)) 
+
+    total_post = cur.fetchone()[0]
+    end_page = total_post // per_page + 1
+    cur_page = min(int(request.args.get('page', 1)), end_page)
+    offset = (cur_page - 1) * per_page
+
+    if mode == 'bookmark':
+        cur.execute("""
+            SELECT p_id, p_uid, p_title, p_content, p_created, p_like, p_classification, lp_uid, c_name 
+            FROM saved_post
+            JOIN posts
+            ON saved_post.s_id = posts.p_id
+            JOIN post_class
+            ON posts.p_classification = post_class.c_id
+            LEFT JOIN liked_post
+            ON posts.p_id = liked_post.lp_id AND liked_post.lp_uid = %s
+            WHERE saved_post.s_uid = %s
+            ORDER BY p_created DESC
+            LIMIT %s OFFSET %s
+        """, (user_id, user_id, per_page, offset))
+    else: # 'write'
+        cur.execute("""
+            SELECT p_id, p_uid, p_title, p_content, p_created, p_like, p_classification, lp_uid, c_name
+            FROM posts 
+            JOIN post_class
+            ON posts.p_classification = post_class.c_id
+            LEFT JOIN liked_post 
+            ON posts.p_id = liked_post.lp_id AND liked_post.lp_uid = %s 
+            WHERE p_uid = %s
+            ORDER BY p_created DESC 
+            LIMIT %s OFFSET %s
+        """, (user_id, user_id, per_page, offset))
+    
+    post_list = cur.fetchall()
+    start_page = ((cur_page-1) // 10) * 10 + 1
+    mid_page = end_page if end_page < start_page + 10 else start_page + 9
+    
+    return render_template(
+        'view_post.html',
+        post_list = post_list,
+        user_id = user_id,
+        pagination = [cur_page, start_page, mid_page, end_page, per_page, total_post],
+        title = title
+    )
 
 
 # @app.route('/userPost/<int:isSaved>',methods=['POST'])  #isSaved 1: 저장한 글, isSaved 0:내가쓴글
@@ -301,7 +395,9 @@ def deletePost(post_id):
     cur = con.cursor()
 
     cur.execute("DELETE FROM posts WHERE p_id={0}".format(post_id))
-    cur.execute("DELETE FROM comment WHERE cm_class={0}".format(post_id))
+    cur.execute("DELETE FROM comment WHERE cm_postID={0}".format(post_id))
+    cur.execute("DELETE FROM liked_post WHERE lp_id={0}".format(post_id))
+    cur.execute("DELETE FROM saved_post WHERE s_id ={0}".format(post_id))
     con.commit()
     con.close()
     return 'success'
@@ -402,7 +498,7 @@ def dubCheck():
         name = request.form['name']
         value = request.form['value']
         return str(len(db(True, ["SELECT {0} FROM user WHERE {0}='{1}'".format(name, value)])[0])) #중복이면 1, 중복 아니면 0
-    except Exception as e:
+    except:
         return 'error'
 
 
@@ -411,6 +507,7 @@ def editFriend(mode,friend_id):
     user_id = session.get('id', None)
     con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
     cur = con.cursor()
+
     try:
         if mode == 0:
             cur.execute("SELECT f_fromid,f_friend FROM friend WHERE f_fromid='{0}' AND f_toid='{1}'".format(user_id, friend_id))
@@ -418,7 +515,7 @@ def editFriend(mode,friend_id):
             con.close()
 
             if len(result) != 0 and result[0][1] == 1: return 'friend'
-            elif len(result) == 0 or result[0][1] == 0: return 's'
+            elif len(result) == 0 or result[0][1] == 0: return 'success'
             elif result[0][1] == 2: return 'request'
         elif mode == 1:
             cur.execute("SELECT f_friend FROM friend WHERE f_fromid='{0}' AND f_toid='{1}'".format(user_id, friend_id))
@@ -431,13 +528,13 @@ def editFriend(mode,friend_id):
 
             con.commit()
             con.close()
-            return 's'
+            return 'success'
         else: 
             cur.execute("DELETE FROM friend WHERE (f_fromid='{0}' AND f_toid='{1}') OR (f_fromid='{1}' AND f_toid='{0}')".format(user_id, friend_id))
             con.commit()
             con.close()
-            return 's'
-    except:return 'f'
+            return 'success'
+    except:return 'db_error'
 
 
 @app.route('/getComment/<int:post_id>&<int:mode>',methods=['POST'])
@@ -504,6 +601,58 @@ def declare(id,isPost):
     user_id = session.get('id',None)
     db(False, ["INSERT INTO declare_user(d_isPost,d_cardID,d_uid) VALUES({0},{1},'{2}')".format(isPost, id, user_id)])
     return 'success'
+
+
+@app.route('/search/<id>',methods=['POST'])
+def searchUser(id):
+    valid_id = '^[가-힣A-Za-z0-9._]{1,20}$'
+
+    if len(id) < 2:
+        return 'short_text'
+
+    if not re.fullmatch(valid_id, id):
+        return 'invalid_id'
+
+    result = list(db(True, ["SELECT u_id FROM user WHERE u_id LIKE '%{0}%'".format(id)])[0])
+    return jsonify(result)
+
+
+@app.route('/updateUser', methods=['POST'])
+def updateUser():
+    # try:
+    user_type = request.form.get('user_type')
+    user_info = request.form.get('user_info')
+    old_id = request.form.get('user_id')
+
+    if user_type == 'u_id':
+        valid_id = '^[가-힣A-Za-z0-9._]{1,20}$'
+        if not re.fullmatch(valid_id, user_info) or len(user_info) > 20 or len(user_info) == 0:
+            return 'invaild_id'
+
+        con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+        cur = con.cursor()
+        cur.execute("SELECT u_id FROM user WHERE u_id='{0}'".format(user_info))
+        if len(cur.fetchall()) == 1:
+            con.close()
+            return 'dup_id'
+        
+        cur.execute("UPDATE user SET u_id = '{0}' WHERE u_id='{1}'".format(user_info, old_id))
+        con.commit()
+        con.close()
+        session['id'] = user_info
+        return 'success'
+    else:
+        if len(user_info) > 30:
+            return 'invaild_intro'
+        
+        con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
+        cur = con.cursor()
+        cur.execute("UPDATE user SET u_intro = '{0}' WHERE u_id='{1}'".format(user_info, old_id))
+        con.commit()
+        con.close()
+        session['user_intro'] = user_info
+        return 'success'
+    # except: return 'db_error'
 
 
 app.run(debug=True)

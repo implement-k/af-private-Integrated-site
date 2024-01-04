@@ -3,9 +3,16 @@
     <head>
         {% include "header.html"%}
         <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src=" {{ url_for('static', filename='javascript/user.js') }}"></script>
         <title>{{user_info[0]}}</title>
     </head>
     <body class="main-section">
+        <section class="modal" id="cancel">
+            <span class="material-symbols-rounded" style="font-size:40px">error</span>
+            <p class="modal-p"></p>
+            <button class="middle-round --full" onclick="closeCancelModal()">닫기</button>
+        </section>
         <header class="nav">
             <div class="nav-main">
                 <button class="head-title" onclick="location.href='/'">
@@ -13,49 +20,131 @@
                     <h1 class="main-title">병사 통합 홈페이지</h1>
                 </button>
                 <nav>
-                    <button class="middle-round --main" onclick="history.back()">이전으로</button>
+                    <button class="middle-round --main" id="middle-round_main" onclick="history.back()">이전으로</button>
                 </nav>
             </div>
         </header>
-        <section class="content">
-            <div style="height: 110px"></div>
-            <div>
-                <img class="profile-img --xlarge" src="{{url_for('static', filename='image/default_profile.jpg')}}">
-                <h1>{{user_info[0]}}</h1>
-                <div>
-                    <p>{{user_info[1]}}</p>
-                    <!-- <button>자기소개 수정</button> -->
-                </div>  
+        <section class="content --user">
+            <div class="user-info">
+                <div class="user-card">
+                    <div class="user-card_info">
+                        <div class="user-card_row">
+                            <img class="profile-img --xlarge" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                            <div class="user-card_info_text">
+                                <span class="user-name">{{user_info.id}}</span>
+                                <span class="user-intro">{{user_info.intro}}</span>
+                            </div>
+                        </div>
+                        <button class="circle --friend --board --small" id="user-edit-btn" onclick="editUserInfo()">
+                            <span class="material-symbols-rounded" id="user-edit-icon" style="font-size:20px;">edit</span>
+                            <span class="circle-search" id="user-edit-text">수정</span>
+                        </button>
+                    </div>
+                    <div class="friend-main_info --container">
+                        <div class="friend-main_info --friend">
+                            <p class="no-margin">&nbsp;&nbsp;친&nbsp;&nbsp;&nbsp;구&nbsp;&nbsp;</p>
+                            <h2 class="no-margin">{{friend_list | length}}</h2>
+                        </div>
+                        <div class="friend-main_info_div">|</div>
+                        <div class="friend-main_info --friend">
+                            <p class="no-margin">친구요청</p>
+                            <h2 class="no-margin">{{reception_list | length}}</h2>
+                        </div>
+                        <div class="friend-main_info_div">|</div>
+                        <div class="friend-main_info --friend">
+                            <p class="no-margin">&nbsp;신청중&nbsp;</p>
+                            <h2 class="no-margin">{{send_list | length}}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-friend">
+                    <div class="user-friend-card">
+                        <h2>친구</h2>
+                        <div class="user-friend-card_list">
+                            {%if friend_list | length%}
+                            {%for friend in friend_list%}
+                            <button class="friend-card --friend" onclick="location.href = '/user/{{friend}}&1'">
+                                <img class="profile-img --medium" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                                <p class="margin-left-p">{{friend}}</p>
+                            </button>
+                            {%endfor%}
+                            {%else%}
+                            <div class="friend-empty-card --rt">
+                                <p>친구요청이 없습니다.</p>
+                            </div>
+                            {%endif%}
+                        </div>
+                    </div>
+                    <div class="user-friend-card">
+                        <div class="card-top-row">
+                            <h2>친구요청</h2>
+                            <button class="circle --friend --board" onclick="location.href='/friend/management'">
+                                <span class="material-symbols-rounded" style="font-size:20px;">navigate_next</span>
+                                <span class="circle-search" id="user-edit-text">친구관리</span>
+                            </button>
+                        </div>
+                        <div class="user-friend-card_list">
+                            {%if reception_list | length%}
+                            {%for friend in reception_list%}
+                            <button class="friend-card --friend" onclick="location.href = '/user/{{friend}}&1'">
+                                <img class="profile-img --medium" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                                <p class="margin-left-p">{{friend}}</p>
+                            </button>
+                            {%endfor%}
+                            {%else%}
+                            <div class="friend-empty-card --rt">
+                                <p>친구요청이 없습니다.</p>
+                            </div>
+                            {%endif%}
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- <div class="main-section" style="flex-wrap:wrap">
-                <div class="board-list-card --private">
-                    <h1>친구</h1>
-                    {%if friend_list | length == 0%}
-                    <p>친구가 없습니다.</p>
-                    {%else%}
-                    {%for friend in friend_list%}
-                    <p>{{friend}}</p>
+            <div class="user-post">
+                <div class="user-post_card --left">
+                    <div class="card-top-row">
+                        <h2>저장한 글</h2>
+                        <button class="circle --friend --board" onclick="location.href='/viewPost/bookmark'">
+                            <span class="material-symbols-rounded" style="font-size:20px;">navigate_next</span>
+                            <span class="circle-search" id="user-edit-text">이동</span>
+                        </button>
+                    </div>
+                    {%if saved_post | length%}
+                    {%for post in saved_post%}
+                    <div class="user-post_saved-post" onclick="location.href = '/board/1&{{post[3]}}&{{post[4]}}&{{post[0]}}'">
+                        <span>{{post[1]}}</span>
+                        <span class="small-font --date">{{post[2]}}</span>
+                    </div>
                     {%endfor%}
+                    {%else%}
+                    <div class="friend-empty-card --rt">
+                        <p>게시물을 저장해보세요.</p>
+                    </div>
                     {%endif%}
                 </div>
-                <div class="board-list-card --private">
-                    <h1>친구 요청</h1>
-                    {%if friend_request_list | length == 0%}
-                    <p>친구 요청이 없습니다.</p>
-                    {%else%}
-                    {%for friend_request in friend_request_list%}
-                    <p>{{friend_request}}</p>
+                <div class="user-post_card --right">
+                    <div class="card-top-row">
+                        <h2>내가 쓴 글</h2>
+                        <button class="circle --friend --board" onclick="location.href='/viewPost/write'">
+                            <span class="material-symbols-rounded" style="font-size:20px;">navigate_next</span>
+                            <span class="circle-search" id="user-edit-text">이동</span>
+                        </button>
+                    </div>
+                    {%if written_post | length%}
+                    {%for post in written_post%}
+                    <div class="user-post_saved-post" onclick="location.href = '/board/1&{{post[3]}}&{{post[4]}}&{{post[0]}}'">
+                        <span>{{post[1]}}</span>
+                        <span class="small-font --date">{{post[2]}}</span>
+                    </div>
                     {%endfor%}
+                    {%else%}
+                    <div class="friend-empty-card --rt">
+                        <p>게시물을 작성해보세요.</p>
+                    </div>
                     {%endif%}
                 </div>
-                <div class="board-list-card --private">
-                    <h1>내가 쓴 글</h1>
-                </div>
-                <div class="board-list-card --private">
-                    <h1>내가 저장한 글</h1>
-                </div>
-            </div> -->
+            </div>
         </section>
-        
+        <div class="dimlayer" id="dimlayer"></div>
     </body>
 </html>

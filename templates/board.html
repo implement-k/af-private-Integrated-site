@@ -3,7 +3,7 @@
     <head>
         {% include "header.html"%}
         <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
-        <title>공군 병사 통합 홈페이지</title>
+        <title>{{class_info.name}}</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script src=" {{ url_for('static', filename='javascript/board.js') }}"></script>
     </head>
@@ -42,7 +42,7 @@
                             <span class="material-symbols-rounded modal-icon" id="like_icon">favorite</span>
                             <span class="modal-num" id="modal-favorite">0</span>
                         </button>
-                        <!-- <button class="small-round-response --big-icon-circle" onclick="bookmark('none')"><span class="material-symbols-rounded">bookmark</span></button> -->
+                        <button class="small-round-response --big-icon-circle" onclick="bookmark('none')"><span class="material-symbols-rounded">bookmark</span></button>
                     </div>
                     {%endif%}
                     <div class="nav-main__dropdown">
@@ -151,7 +151,7 @@
                         </button>
                         {%endif%}
                         </button>
-                        <!-- <button class="small-round-response --icon-circle" onclick="bookmark('{{post[0]}}')"><span class="material-symbols-rounded">bookmark</span></button> -->
+                        <button class="small-round-response --icon-circle" onclick="bookmark('{{post[0]}}')"><span class="material-symbols-rounded">bookmark</span></button>
                         {% endif %}
                         <p class="small-font --date">{{post[4]}}</p>
                     </div>

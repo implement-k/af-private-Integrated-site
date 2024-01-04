@@ -12,6 +12,21 @@ button{cursor:pointer;border:0;color:black}
     &.--signup{width:100%;margin:0 0 20px 0;flex-direction:column;}
 }
 
+@media(max-width: 767px){
+    .head-title{
+        padding:0 20px 0 20px;
+        border-radius: 0 0 25px 25px;
+        width:100%;
+        margin-right:0;
+    }
+    #middle-round_main{
+        visibility: hidden;
+        height:0;
+        width:0;
+    }
+
+}
+
 .small-round{
     height: 22px;
     display: flex;
@@ -172,6 +187,19 @@ button{cursor:pointer;border:0;color:black}
     }
 }
 
+@media(max-width: 767px){
+    .middle-round.--label{
+        visibility:hidden;
+        width:0;
+    }
+    .middle-round.--login{
+        position:absolute;
+        right:48%;
+        top:60px;
+        transform: translate(50%,0);
+    }
+}
+
 .large-round{
     border-radius: 25px;
     height:60px;
@@ -247,6 +275,32 @@ button{cursor:pointer;border:0;color:black}
             transition: background 0s;
             &#add{
                 background-color: rgb(240,160,5);
+            }
+        }
+    }
+    &.--friend{
+        border-radius:25px;
+        margin:0;
+        transition:all .3s ease 0s;
+        &:hover{
+            width:100px;
+            & .circle-search{
+                font-size:small;
+                margin-left:10px;
+            }
+        }
+    }
+    &.--small{
+        width:30px;
+        height:30px;
+        border-radius:15px;
+        margin:0;
+        transition:all .3s ease 0s;
+        &:hover{
+            width:80px;
+            & .circle-search{
+                font-size:small;
+                margin-left:10px;
             }
         }
     }
