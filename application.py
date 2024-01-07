@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 import pymysql, uuid, re
 import os 
 
-app = Flask(__name__)
-app.secret_key = uuid.uuid4().hex
+application = Flask(__name__)
+application.secret_key = uuid.uuid4().hex
 
 load_dotenv()
 U = os.environ.get('user')
@@ -31,7 +31,7 @@ def db(isOutput, sql):
     con.close()
         
 
-@app.route('/login/',methods=['POST', 'GET'])
+@application.route('/login/',methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
         con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
@@ -60,7 +60,7 @@ def login():
         else: return render_template('login.html',isCorrect=1)
 
 
-@app.route('/logout/')
+@application.route('/logout/')
 def logout():
     if "id" in session:
         session.pop('id',None)
@@ -68,7 +68,7 @@ def logout():
     return redirect('/')
 
 
-@app.route('/signup/',methods=['POST', 'GET'])
+@application.route('/signup/',methods=['POST', 'GET'])
 def signup():
     if request.method == 'POST':
         try:
@@ -88,7 +88,7 @@ def signup():
         else: return render_template('signup.html')
 
 
-@app.route('/board/<int:mode>&<int:class_id>&<class_name>&<int:post_id>',methods=['POST', 'GET'])
+@application.route('/board/<int:mode>&<int:class_id>&<class_name>&<int:post_id>',methods=['POST', 'GET'])
 def board(mode, class_id, class_name, post_id):    #mode 0: 글작성, mode 1: 글보기, mode 2: 글 수정, mode 2,3 저장한 게시물, 내가쓴글
     user_id = session.get('id', None)              #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
     if not user_id and class_id != 1:
@@ -171,7 +171,7 @@ def board(mode, class_id, class_name, post_id):    #mode 0: 글작성, mode 1: �
             )
 
 
-@app.route('/',methods=['POST', 'GET'])
+@application.route('/',methods=['POST', 'GET'])
 def home():
     user_id = session.get('id', None)
 
@@ -197,7 +197,7 @@ def home():
         return redirect('/board/1&1&공군&0')
 
 
-@app.route('/calender')
+@application.route('/calender')
 def calender():
     user_id = session.get('id', None)       #로그인 안하거나 익명도 글 작성이 가능한 게시판이 아니라면 로그인페이지로 리다이렉트
     if not user_id: return redirect('/login')
@@ -207,7 +207,7 @@ def calender():
     return render_template('calender.html', user_info=user_info)
 
 
-@app.route('/friend/management')
+@application.route('/friend/management')
 def manageFriend():
     user_id = session.get('id', None)
     
@@ -243,7 +243,7 @@ def manageFriend():
         return redirect('/login')
 
 
-@app.route('/user/<name>&<int:mode>')
+@application.route('/user/<name>&<int:mode>')
 def privateUser(name, mode):                  #mode 0: 개인, mode 1 남
     user_id = session.get('id', None)
 
@@ -301,7 +301,7 @@ def privateUser(name, mode):                  #mode 0: 개인, mode 1 남
         return redirect('/login')
 
 
-@app.route('/viewPost/<mode>')
+@application.route('/viewPost/<mode>')
 def viewPost(mode):
     user_id = session.get('id', None)
 
@@ -367,7 +367,7 @@ def viewPost(mode):
     )
 
 
-# @app.route('/userPost/<int:isSaved>',methods=['POST'])  #isSaved 1: 저장한 글, isSaved 0:내가쓴글
+# @application.route('/userPost/<int:isSaved>',methods=['POST'])  #isSaved 1: 저장한 글, isSaved 0:내가쓴글
 # def declare(isSaved):
 #     user_id = session.get('id',None)
 #     if isSaved == 1:
@@ -376,7 +376,7 @@ def viewPost(mode):
 #     return 'success'
 
 
-@app.route('/createPost/<int:class_id>&<mode>', methods=['POST']) 
+@application.route('/createPost/<int:class_id>&<mode>', methods=['POST']) 
 def createPost(class_id,mode):
     user_id = session.get('id', None)
     title = request.form.get('title')
@@ -389,7 +389,7 @@ def createPost(class_id,mode):
     return '1'
 
 
-@app.route('/deletePost/<int:post_id>', methods=['POST']) 
+@application.route('/deletePost/<int:post_id>', methods=['POST']) 
 def deletePost(post_id):
     con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
     cur = con.cursor()
@@ -403,7 +403,7 @@ def deletePost(post_id):
     return 'success'
 
 
-@app.route('/likePost/<int:post_id>&<int:mode>', methods=['POST'])  #mode 0:좋아요 추가, mode 1:좋아요 취소
+@application.route('/likePost/<int:post_id>&<int:mode>', methods=['POST'])  #mode 0:좋아요 추가, mode 1:좋아요 취소
 def likePost(post_id,mode):
     user_id = session.get('id', None)
     con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
@@ -443,7 +443,7 @@ def likePost(post_id,mode):
     else: return 'fail'
 
 
-@app.route('/likeClass/<int:isAdd>',methods=['POST'])   #isAdd 1: 좋아요 추가, isAdd 0: 좋아요 삭제
+@application.route('/likeClass/<int:isAdd>',methods=['POST'])   #isAdd 1: 좋아요 추가, isAdd 0: 좋아요 삭제
 def likeClass(isAdd):
     user_id = session.get('id', None)
     class_id = request.form['classID']
@@ -473,7 +473,7 @@ def likeClass(isAdd):
         return 'success'
 
 
-@app.route('/bookmarkPost/<int:post_id>',methods=['POST'])
+@application.route('/bookmarkPost/<int:post_id>',methods=['POST'])
 def bookmarkPost(post_id):
     user_id = session.get('id', None)
 
@@ -492,7 +492,7 @@ def bookmarkPost(post_id):
     except: return 'db_error'
 
 
-@app.route('/isDub',methods=['POST'])
+@application.route('/isDub',methods=['POST'])
 def dubCheck():
     try:
         name = request.form['name']
@@ -502,7 +502,7 @@ def dubCheck():
         return 'error'
 
 
-@app.route('/manageFriend/<int:mode>&<friend_id>',methods=['POST'])
+@application.route('/manageFriend/<int:mode>&<friend_id>',methods=['POST'])
 def editFriend(mode,friend_id):
     user_id = session.get('id', None)
     con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
@@ -537,7 +537,7 @@ def editFriend(mode,friend_id):
     except:return 'db_error'
 
 
-@app.route('/getComment/<int:post_id>&<int:mode>',methods=['POST'])
+@application.route('/getComment/<int:post_id>&<int:mode>',methods=['POST'])
 def getComment(post_id,mode): #mode 0 조회, mode 1 추가, mode 2 수정, mode 3 삭제, mode 4 대댓글 불러오기, mode 5 대댓글 삭제
     user_id = session.get('id',None)
     if mode == 0:
@@ -596,14 +596,14 @@ def getComment(post_id,mode): #mode 0 조회, mode 1 추가, mode 2 수정, mode
         return 'success'
 
 
-@app.route('/declare/<int:id>&<int:isPost>',methods=['POST'])
+@application.route('/declare/<int:id>&<int:isPost>',methods=['POST'])
 def declare(id,isPost):
     user_id = session.get('id',None)
     db(False, ["INSERT INTO declare_user(d_isPost,d_cardID,d_uid) VALUES({0},{1},'{2}')".format(isPost, id, user_id)])
     return 'success'
 
 
-@app.route('/search/<id>',methods=['POST'])
+@application.route('/search/<id>',methods=['POST'])
 def searchUser(id):
     valid_id = '^[가-힣A-Za-z0-9._]{1,20}$'
 
@@ -617,7 +617,7 @@ def searchUser(id):
     return jsonify(result)
 
 
-@app.route('/updateUser', methods=['POST'])
+@application.route('/updateUser', methods=['POST'])
 def updateUser():
     # try:
     user_type = request.form.get('user_type')
@@ -655,4 +655,4 @@ def updateUser():
     # except: return 'db_error'
 
 
-app.run(debug=True)
+application.run(debug=True)
