@@ -1,7 +1,6 @@
 from flask import Flask, render_template, url_for, request, session, redirect, jsonify
 from dotenv import load_dotenv
-import pymysql, uuid, re
-import os 
+import pymysql, uuid, re, os
 
 application = Flask(__name__)
 application.secret_key = uuid.uuid4().hex
@@ -11,6 +10,12 @@ U = os.environ.get('user')
 P = os.environ.get('password')
 H = os.environ.get('host')
 D = os.environ.get('db')
+# if 'RDS_HOSTNAME' in os.environ:
+#     U = os.environ['RDS_USERNAME']
+#     P = os.environ['RDS_PASSWORD']
+#     H = os.environ['RDS_HOSTNAME']
+#     D = os.environ['RDS_DB_NAME']
+#     port = os.environ['RDS_PORT']
 
 
 def db(isOutput, sql):
