@@ -655,4 +655,4 @@ def updateUser():
     # except: return 'db_error'
 
 
-application.run(debug=True)
+application.run()
