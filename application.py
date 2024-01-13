@@ -5,12 +5,11 @@ import pymysql, uuid, re, os
 application = Flask(__name__)
 application.secret_key = uuid.uuid4().hex
 
-if 'RDS_HOSTNAME' in os.environ:
-    U = os.environ['RDS_USERNAME']
-    P = os.environ['RDS_PASSWORD']
-    H = os.environ['RDS_HOSTNAME']
-    D = os.environ['RDS_DB_NAME']
-    port = os.environ['RDS_PORT']
+load_dotenv()
+U = os.environ.get('user')
+P = os.environ.get('password')
+H = os.environ.get('host')
+D = os.environ.get('db')
 
 
 def db(isOutput, sql):
