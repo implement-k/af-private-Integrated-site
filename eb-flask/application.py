@@ -11,6 +11,9 @@ P = os.environ.get('password')
 H = os.environ.get('host')
 D = os.environ.get('db')
 
+application.add_url_rule('/', 'index',home)
+
+
 
 def db(isOutput, sql):
     con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
@@ -655,4 +658,6 @@ def updateUser():
     # except: return 'db_error'
 
 
-application.run()
+if __name__ == "__main__":
+    application.debug = True #무조건 제거
+    application.run()
