@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src=" {{ url_for('static', filename='javascript/board.js') }}"></script>
+        <title>공군 병사 통합 홈페이지</title>
+    </head>
+    <body class="main-section">
+        <section class="modal" id="yn">
+            <span class="material-symbols-rounded" style="font-size:40px">error</span>
+            <p class="modal-p">오류</p>
+            <button class="middle-round --login" onclick="closeModal()">아니요</button>
+            <button class="middle-round --yes" onclick="execute()">예</button>
+        </section>
+        <section class="modal" id="cancel">
+            <span class="material-symbols-rounded" style="font-size:40px">error</span>
+            <p class="modal-p"></p>
+            <button class="middle-round --full" onclick="closeCancelModal()">닫기</button>
+        </section>
+        <header class="nav">
+            <div class="nav-main">
+                <button class="head-title" onclick="location.href='/'">
+                    <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                    <h1 class="main-title">병사 통합 홈페이지</h1>
+                </button>
+                <nav>
+                    <button class="middle-round --main" id="middle-round_main_back" onclick="history.back()">이전으로</button>
+                </nav>
+            </div>
+        </header>
+        <section class="content">
+            <div style="height: 110px"></div>
+            {%for post in post_list%}
+            <div class="post-card">
+                <div class="post-card_action">
+                    <div class="post-card_action">
+                        <h3 class="margin-top-add" id="title{{post[0]}}">{{post[2]}}</h3>
+                        <button class="small-round" onclick="location.href='/user/'+'{{post[1]}}'+'&1'">
+                            <!--TODO 사용자 계정 사진-->
+                            <img class="profile-img --small" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                            <p class="small-font" id="user{{post[0]}}">{{post[1]}}</p> 
+                        </button>
+                    </div>
+                    {% if user_id == post[1] %}
+                    <div class="post-card_action">
+                        <button class="small-round-border --edit" title="수정하기" onclick="showModal('edit','{{post[0]}}')">
+                            <span class="material-symbols-rounded">edit</span>
+                        </button> 
+                        <button class="small-round-border --delete" title="삭제하기" onclick="showModal('del','{{post[0]}}')">
+                            <span class="material-symbols-rounded">close</span>
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+                <p class="content-p" id='content{{post[0]}}'></p>
+                <script>replaceEnter('{{post[0]}}','{{post[3]}}')</script>
+                <div class="post-card_action --bottom">
+                    <div class="post-card_action">
+                        {%if not post[7] == None%}
+                        <button class="small-round-response --favorite btn{{post[0]}}" id="unlike_btn" onclick="unfavorite('{{post[0]}}')">
+                            <span class="material-symbols-rounded icon{{post[0]}}" id="unlike_icon">favorite</span>
+                            <span id="like_num{{post[0]}}">{{post[5]}}</span>
+                        </button>
+                        {%else%}
+                        <button class="small-round-response --favorite btn{{post[0]}}" id="like_btn" onclick="favorite('{{post[0]}}')">
+                            <span class="material-symbols-rounded icon{{post[0]}}" id="like_icon">favorite</span>
+                            <span id="like_num{{post[0]}}">{{post[5]}}</span>
+                        </button>
+                        {%endif%}
+                        <button class="small-round-response --icon-circle" onclick="bookmark('{{post[0]}}')">
+                            <span class="material-symbols-rounded">bookmark</span>
+                        </button>
+                        <p class="small-font --date">{{post[4]}}</p>
+                    </div>
+                    <button class="small-round-response --icon-circle" onclick="location.href = '/board/1&{{post[6]}}&{{post[8]}}&{{post[0]}}'">
+                        <span class="material-symbols-rounded">forum</span>
+                    </button>
+                </div>
+            </div>
+            {%endfor%}
+            <div class="pagination">
+                {%if pagination[1] > 10%}
+                <button class="small_circle" onclick="goPage((Number('{{pagination[1]}}')-1).toString())">
+                    <span class="material-symbols-rounded nav_arrow">navigate_before</span>
+                </button>
+                {%endif%}
+                {%for i in range(pagination[1], pagination[2]+1)%}
+                {%if i == pagination[0]%}
+                <button class="focus_num" onclick="goPage('{{i}}')">{{i}}</button>
+                {%else%}
+                <button class="unfocus_num" onclick="goPage('{{i}}')">{{i}}</button>
+                {%endif%}
+                {%endfor%}
+                {%if pagination[3] >= pagination[1] + 10%}
+                <button class="small_circle" onclick="goPage((Number('{{pagination[2]}}')+1).toString())">
+                    <span class="material-symbols-rounded nav_arrow">navigate_next</span>
+                </button>
+                {%endif%}
+            </div>
+        </section>
+        <div class="dimlayer" id="dimlayer"></div>
+    </body>
+</html>

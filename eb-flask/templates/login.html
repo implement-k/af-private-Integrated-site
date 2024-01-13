@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/login.css') }}"/>
+        <title>공군 병사 통합 홈페이지-로그인</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src=" {{ url_for('static', filename='javascript/login.js') }}"></script>
+    </head>
+    <body class="login-body">
+        <section class="login-main">
+            <button class="head-title_login" onclick="location.href='/'">
+                <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                <h1 class="main-title">병사 통합 홈페이지</h1>
+            </button>
+            <form method="post">
+                <input class="login-form_input --id" type="text" id="id" name="id" placeholder="아이디" style="border-radius: 25px 25px 0 0;">
+                <input class="login-form_input --pw" type="password" id="password" name="password" placeholder="비밀번호">
+                <script>paint_login_button();prevent_signin_enter()</script>
+                <div style="display: flex;">
+                    <button type="button" class="large-round --signup" id="signup" onclick="location.href='/signup/'">회원가입</button>
+                    <button class="large-round --signin" id="signin" onclick="location.href='/login'" disabled>로그인</button>
+                </div>
+            </form>
+            {%if isCorrect == 0%}
+            <div class="login-alert">아이디나 비밀번호를 다시 확인해주세요.</div>
+            {%endif%}
+        </section>
+    </body>
+</html>

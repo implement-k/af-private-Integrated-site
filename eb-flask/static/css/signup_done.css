@@ -1,0 +1,6 @@
+h1, p, button, span, input, div{font-family:'Noto Sans KR', sans-serif;}
+body, html{height:100%;width:100%;margin:0;background-color:rgb(245, 245, 245);}
+.signup-p{margin:0;font-size: large;font-weight:800;}
+.signup-body{display:flex;align-items:center;justify-content:center;background-color:rgb(245, 245, 245);}
+.signup-main{display:flex;flex-direction:row;justify-content:space-between;align-items:center;width:450px;border-radius:25px;background-color:rgb(202, 206, 214);padding:25px;}
+.signup-main_text{display:flex;flex-direction:column;}

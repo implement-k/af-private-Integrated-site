@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/calender.css') }}"/>
+        <title>공군 병사 통합 홈페이지 - 캘린더</title>
+        <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script defer src=" {{ url_for('static', filename='javascript/calender.js') }}"></script>
+    </head>
+    <body class="main-section">
+        <header class="nav">
+            <div class="nav-main">
+                <button class="head-title" onclick="location.href='/'">
+                    <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                    <h1 class="main-title">병사 통합 홈페이지</h1>
+                </button>
+                <nav>
+                    <button class="middle-round --main" onclick="location.href='/calender'">캘린더</button>
+                    <button class="middle-round --main" onclick="location.href='/friend/management'">친구관리</button>
+                </nav>
+            </div>
+            {% include "dropdown.html" %}
+        </header>
+        <section class="content">
+            <div style="height: 110px"></div>
+            다음과 같은 기능이 추가될 예정이에요.<br>
+            *휴가 관리<br>
+            *친구와 휴가 맞추기
+            <!-- 
+            <div>
+                <div>
+                    <div class="board-list-card">
+                        <h1>D-day</h1>
+                        <h1>휴가 관리</h1>
+                    </div>
+                    <div class="board-list-card">
+                        <h1>친구</h1>
+                    </div>
+                </div>
+                <div>
+                    <div class="board-list-card calender-row">
+                        <h2>12월</h2>
+                        <div>
+                            <button>이전</button>
+                            <button>다음</button>
+                        </div>
+                    </div>
+                    <div class="calender-row">
+                        <div class="date">sun</div>
+                        <div class="date">mon</div>
+                        <div class="date">tue</div>
+                        <div class="date">wed</div>
+                        <div class="date">thu</div>
+                        <div class="date">fri</div>
+                        <div class="date">sat</div>
+                    </div>
+                    <div class="board-list-card --no-padding">
+                        <div class="calender-row" id="row_1">
+                            <div class="calender-box">
+                                <div>1</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>2</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>3</div>
+                                <div class="schedule --one">일정</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>4</div>
+                                <div class="schedule --start">일정</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>5</div>
+                                <div class="schedule --middle">일정</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>6</div>
+                                <div class="schedule --end">일정</div>
+                            </div>
+                            <div class="calender-box --r">
+                                <div>7</div>
+                            </div>
+                        </div>
+                        <div class="calender-row" id="row_1">
+                            <div class="calender-box">
+                                <div>1</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>2</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>3</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>4</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>5</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>6</div>
+                            </div>
+                            <div class="calender-box --r">
+                                <div>7</div>
+                            </div>
+                        </div>
+                        <div class="calender-row" id="row_1">
+                            <div class="calender-box">
+                                <div>1</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>2</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>3</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>4</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>5</div>
+                            </div>
+                            <div class="calender-box">
+                                <div>6</div>
+                            </div>
+                            <div class="calender-box --r">
+                                <div>7</div>
+                            </div>
+                        </div>
+                        <div class="calender-row" id="row_1">
+                            <div class="calender-box --b">
+                                <div>1</div>
+                            </div>
+                            <div class="calender-box --b">
+                                <div>2</div>
+                            </div>
+                            <div class="calender-box --b">
+                                <div>3</div>
+                            </div>
+                            <div class="calender-box --b">
+                                <div>4</div>
+                            </div>
+                            <div class="calender-box --b">
+                                <div>5</div>
+                            </div>
+                            <div class="calender-box --b">
+                                <div>6</div>
+                            </div>
+                            <div class="calender-box  --rb">
+                                <div>7</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>create_row()</script> -->
+        </section>
+    </body>
+</html>

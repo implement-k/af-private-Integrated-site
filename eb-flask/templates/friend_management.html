@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>친구관리</title>
+        {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src=" {{ url_for('static', filename='javascript/friend.js') }}"></script>
+    </head>
+    <body class="main-section">
+        <header class="nav">
+            <div class="nav-main">
+                <button class="head-title" onclick="location.href='/'">
+                    <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                    <h1 class="main-title">병사 통합 홈페이지</h1>
+                </button>
+                <nav>
+                    <button class="middle-round --main" onclick="history.back()">이전으로</button>
+                </nav>
+            </div>
+        </header>
+        <div class="content">
+            <div style="height: 110px"></div>
+            <div class="search-bar">
+                <input class="search-bar_search" id="search-user-input" type="text" placeholder="아이디 검색" oninput="changeValue()" onclick="showSearch()">
+                <div class="search-bar_section">
+                    <button class="circle --friend --board" style="visibility:hidden;" id="user-search-btn" onclick="showSearchResult()">
+                        <span class="material-symbols-rounded">search</span>
+                        <span class="circle-search">검색</span>
+                    </button>
+                </div>
+            </div>
+            <div class="main-content">
+                <div class="board-list-card --friend-main">
+                    <div class="friend-main_profile">
+                        <img class="profile-img --xlarge" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                        <h2 class="margin-left-h">{{user_id}}</h2>
+                    </div>
+                    <div class="friend-main_info --container">
+                        <div class="friend-main_info --friend">
+                            <p class="no-margin">&nbsp;&nbsp;친&nbsp;&nbsp;&nbsp;구&nbsp;&nbsp;</p>
+                            <h2 class="no-margin">{{friend_list | length}}</h2>
+                        </div>
+                        <div class="friend-main_info_div">|</div>
+                        <div class="friend-main_info --friend">
+                            <p class="no-margin">친구요청</p>
+                            <h2 class="no-margin">{{reception_list | length}}</h2>
+                        </div>
+                        <div class="friend-main_info_div">|</div>
+                        <div class="friend-main_info --friend">
+                            <p class="no-margin">&nbsp;신청중&nbsp;</p>
+                            <h2 class="no-margin">{{send_list | length}}</h2>
+                        </div>
+                    </div>
+                </div>    <!--친구 목록 스크롤 가능하게-->
+                <div class="board-list-card --friend-tab --rt">
+                    <div class="friend-tab_label"><h3>친구요청</h3></div>
+                    <div class="friend-tab_content --request">
+                        {%if reception_list | length%}
+                        {%for friend in reception_list%}
+                        <div class="friend-card">
+                            <div class="friend-card_profile">
+                                <img class="profile-img --medium" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                                <p class="margin-left-p">{{friend}}</p>
+                            </div>
+                            <button class="medium-round --add" title="친구수락" onclick="addFriend('{{friend}}')">
+                                <span class="material-symbols-rounded" style="font-size:20px;color:rgb(11, 85, 44)">add</span>
+                            </button>
+                        </div>
+                        {%endfor%}
+                        {%else%}
+                        <div class="friend-empty-card --rt">
+                            <p>친구요청이 없습니다.</p>
+                        </div>
+                        {%endif%}
+                    </div>
+                </div>
+                <div class="board-list-card --friend-tab">
+                    <div class="friend-tab_label"><h3>친구</h3></div>
+                    <div class="friend-tab_content --default">
+                        {%if friend_list | length%}
+                        {%for friend in friend_list%}
+                        <button class="friend-card --friend" onclick="location.href = '/user/{{friend}}&1'">
+                            <img class="profile-img --medium" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                            <p class="margin-left-p">{{friend}}</p>
+                        </button>
+                        {%endfor%}
+                        {%else%}
+                        <div class="friend-empty-card">
+                            <p style="margin-top:6px">친구가 없습니다.</p>
+                        </div>
+                        {%endif%}
+                    </div>
+                </div>
+                <div class="board-list-card --friend-tab">
+                    <div class="friend-tab_label"><h3>신청중</h3></div>
+                    <div class="friend-tab_content --default">
+                        {%if send_list | length%}
+                        {%for friend in send_list%}
+                        <div class="friend-card">
+                            <div class="friend-card_profile">
+                                <img class="profile-img --medium" src="{{url_for('static', filename='image/default_profile.jpg')}}">
+                                <p class="margin-left-p">{{friend}}</p>
+                            </div>
+                            <button class="medium-round --cancel" title="친구 삭제" onclick="removeFriend('{{friend}}')">
+                                <span class="material-symbols-rounded" style="color:rgb(80, 15, 15);font-size:20px;">close</span>
+                            </button>
+                        </div>
+                        {%endfor%}
+                        {%else%}
+                        <div class="friend-empty-card">
+                            <p style="margin-top:6px">신청중인 친구가 없습니다.</p>
+                        </div>
+                        {%endif%}
+                    </div>
+                </div>
+            </div>
+            <button class="dimlayer_friend" id="dimlayer" onclick="closeSearch()"></button>
+        </div>
+    </body>
+</html>
