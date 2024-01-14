@@ -653,4 +653,5 @@ def updateUser():
     # except: return 'db_error'
 
 
-application.run()
+if __name__ == "__main__":
+    application.run()
