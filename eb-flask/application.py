@@ -1,9 +1,11 @@
 from flask import Flask, render_template, url_for, request, session, redirect, jsonify
 from dotenv import load_dotenv
 import pymysql, uuid, re, os
+import logging
 
 application = Flask(__name__)
 application.secret_key = uuid.uuid4().hex
+application.logger.setLevel(logging.DEBUG)
 
 
 load_dotenv()
