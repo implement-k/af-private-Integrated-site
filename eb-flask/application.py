@@ -13,6 +13,7 @@ U = os.environ.get('user')
 P = os.environ.get('password')
 H = os.environ.get('host')
 D = os.environ.get('db')
+#ASDF
 
 
 @application.route('/',methods=['POST', 'GET'])
@@ -22,7 +23,7 @@ def home():
     if user_id:
         user_intro = session.get('user_intro', None)
         if not user_intro: user_intro = "자기소개가 없습니다."
-
+ 
         sql = [
             "SELECT * FROM post_class",
             "SELECT l_cid, c_name FROM liked_class, post_class WHERE liked_class.l_cid = post_class.c_id and l_uid='{0}'".format(user_id),
