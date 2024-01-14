@@ -193,8 +193,7 @@ def home():
             friend_list = result[2]
         )
     else:
-        return redirect('/login')
-        # return redirect('/board/1&1&공군&0')
+        return redirect('/board/1&1&공군&0')
 
 
 @application.route('/calender')
