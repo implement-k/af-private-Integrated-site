@@ -11,6 +11,31 @@ P = os.environ.get('password')
 H = os.environ.get('host')
 D = os.environ.get('db')
 
+@application.route('/',methods=['POST', 'GET'])
+def home():
+    user_id = session.get('id', None)
+
+    if user_id:
+        user_intro = session.get('user_intro', None)
+        if not user_intro: user_intro = "자기소개가 없습니다."
+
+        sql = [
+            "SELECT * FROM post_class",
+            "SELECT l_cid, c_name FROM liked_class, post_class WHERE liked_class.l_cid = post_class.c_id and l_uid='{0}'".format(user_id),
+            "SELECT f_toid,f_friend FROM friend WHERE f_fromid='{0}' AND f_friend=1".format(user_id)
+        ]
+        result = db(True, sql)
+            
+        return render_template(
+            'home.html',
+            user_info = {'id':user_id, 'intro':user_intro},
+            class_list = result[0],
+            liked_class_list = result[1],
+            friend_list = result[2]
+        )
+    else:
+        return redirect('/board/1&1&공군&0')
+
 
 def db(isOutput, sql):
     con = pymysql.connect(user=U,passwd=P,host=H,db=D,charset='utf8')
@@ -168,32 +193,6 @@ def board(mode, class_id, class_name, post_id):    #mode 0: 글작성, mode 1: �
                 user_info = {'id':user_id, 'intro':user_intro},
                 isEdit = False if mode == 0 else True
             )
-
-
-@application.route('/',methods=['POST', 'GET'])
-def home():
-    user_id = session.get('id', None)
-
-    if user_id:
-        user_intro = session.get('user_intro', None)
-        if not user_intro: user_intro = "자기소개가 없습니다."
-
-        sql = [
-            "SELECT * FROM post_class",
-            "SELECT l_cid, c_name FROM liked_class, post_class WHERE liked_class.l_cid = post_class.c_id and l_uid='{0}'".format(user_id),
-            "SELECT f_toid,f_friend FROM friend WHERE f_fromid='{0}' AND f_friend=1".format(user_id)
-        ]
-        result = db(True, sql)
-            
-        return render_template(
-            'home.html',
-            user_info = {'id':user_id, 'intro':user_intro},
-            class_list = result[0],
-            liked_class_list = result[1],
-            friend_list = result[2]
-        )
-    else:
-        return redirect('/board/1&1&공군&0')
 
 
 @application.route('/calender')
