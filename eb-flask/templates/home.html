@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/style.css') }}"/>
+        <title>공군 병사 통합 홈페이지</title>
+    </head>
+    <body class="main-section">
+        <header class="nav">
+            <div class="nav-main">
+                <button class="head-title" onclick="location.href='/'">
+                    <img class="main-logo" src="{{ url_for('static', filename='image/af_logo.svg') }}">
+                    <h1 class="main-title">병사 통합 홈페이지</h1>
+                </button>
+                <nav>
+                    <button class="middle-round --main" id="middle-round_main" onclick="location.href='/calender'">캘린더</button>
+                    <button class="middle-round --main" id="middle-round_main" onclick="location.href='/friend/management'">친구관리</button>
+                </nav>
+            </div>
+            {% include "dropdown.html" %}
+        </header>
+        <div class="home-media">
+            <section class="mobile-home-nav">
+                <div style="display:flex;align-items:center;width:97%;padding:20px 0 20px 0;flex-wrap: wrap;">
+                    <button style="height:125px;width:170px;border-radius:20px;padding:15px;background-color:rgb(176, 193, 217);margin-right:10px;box-shadow:0 0 6px .1px rgb(175,175,175);" onclick="location.href='/calender'">
+                        <div style="display:flex;flex-direction:column;align-items:baseline;">
+                            <span style="display:block;text-align:left;font-size:large;font-weight:700;margin-bottom:5px;">캘린더</span>
+                            <span style="display:block;text-align:left;">휴가와 일정을 관리해<br>보세요.</span>
+                        </div>
+                    </button>
+                    <button style="height:125px;width:170px;border-radius:20px;padding:15px;background-color:rgb(176, 193, 217); box-shadow:0 0 6px .1px rgb(175,175,175);" onclick="location.href='/friend/management'">
+                        <div style="display:flex;flex-direction:column;align-items:baseline;">
+                            <span style="display:block;text-align:left;font-size:large;font-weight:700;margin-bottom:5px;">친구관리</span>
+                            <span style="display:block;text-align:left;">친구와 함께 휴가를 맞춰보세요.</span>
+                        </div>
+                    </button>
+                </div>
+            </section>
+            <section class="home">
+                <div class="home_content --left">
+                    <div class="board-list-card --like">
+                        <h2 class="margin-top-remove">즐겨찾기</h2>
+                        <div>
+                            {% if liked_class_list | length == 0 %}
+                            <div class="board-list-card_empty">
+                                <p>즐겨찾는 게시판을 추가하세요.</p>
+                            </div>
+                            {%else%}
+                            {%for liked_class in liked_class_list%}
+                            <a class="a-margin-top-add" href="/board/1&{{liked_class[0]}}&{{liked_class[1]}}&0">{{liked_class[1]}}</a>
+                            {%endfor%}
+                            {%endif%}
+                        </div>
+                    </div>
+                    <div class="board-list-card" id="middle-friend-list-card">
+                        <h2 class="margin-top-remove">친구</h2>
+                        <div>
+                            {% if friend_list | length == 0 %}
+                            <div class="board-list-card_empty">
+                                <p>친구를 추가하세요.</p>
+                            </div>
+                            {%else%}
+                            {%for friend in friend_list%}
+                                <a class="a=margin-top-add" href="/user/{{friend[0]}}&1">{{friend[0]}}</a>
+                            {%endfor%}
+                            {%endif%}
+                        </div>
+                    </div>
+                    <div class="board-list-card">
+                        <h2 class="margin-top-remove">모든 게시판</h2>
+                        <div>
+                            {%for class in class_list%}
+                                <a class="a-margin-top-add" href="/board/1&{{class[0]}}&{{class[1]}}&0">{{class[1]}}</a>
+                            {%endfor%}
+                        </div>
+                    </div>
+                </div>
+                <div class="home_content --right">
+                    <div>
+                        <!-- TODO 캘린더 위젯 -->
+                    </div>
+                    <div class="board-list-card" id="last-friend-list-card">
+                        <h2 class="margin-top-remove">친구</h2>
+                        <div>
+                            {% if friend_list | length == 0 %}
+                            <div class="board-list-card_empty">
+                                <p>친구를 추가하세요.</p>
+                            </div>
+                            {%else%}
+                            {%for friend in friend_list%}
+                                <a class="a=margin-top-add" href="/user/{{friend[0]}}&1">{{friend[0]}}</a>
+                            {%endfor%}
+                            {%endif%}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </body>
+</html>

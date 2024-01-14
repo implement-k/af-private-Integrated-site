@@ -1,0 +1,35 @@
+.calender-row{
+    display:flex;
+    flex-direction:row;
+}
+
+.calender-box{
+    display:flex;
+    height: 150px;
+    flex: 1;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    border-bottom:0.25px solid rgb(225, 225, 225);
+    border-right:0.25px solid rgb(225, 225, 225);
+    &.--r{border-right:0;}
+    &.--b{border-bottom:0;}
+    &.--rb{border:0;}
+}
+
+.date{
+    display:flex;
+    flex: 1;
+    justify-content:center;
+    align-items:center;
+}
+
+.schedule{
+    height: auto;
+    width:100%;
+    background-color: brown;
+    &.--one{border-radius: 3px;}
+    &.--start{border-radius: 3px 0 0 3px;border-right:0.25px solid brown;}
+    &.--middle{border-radius:0;border-right:0.25px solid brown;border-left:0.25px solid brown;}
+    &.--end{border-radius:0 3px 3px 0;border-left:0.25px solid brown;}
+}

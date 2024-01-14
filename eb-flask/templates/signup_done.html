@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% include "header.html"%}
+        <link rel="stylesheet" href=" {{ url_for('static', filename='css/signup_done.css') }}"/>
+        <title>회원가입 완료</title>
+        <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script defer src=" {{ url_for('static', filename='javascript/signup_done.js') }}"></script>
+    </head>
+    <body class="signup-body">
+        <div class="signup-main">
+            <div class="signup-main_text">
+                <span class="material-symbols-rounded"style="font-size:40px;">verified</span>
+                <p class="signup-p">회원가입 완료</p>
+            </div>
+            <button class="big_square_button" onclick="location.href='/login'">
+                <span class="material-symbols-rounded" style="font-size:40px;color:rgb(235,235,235);">navigate_next</span>
+            </button>
+        </div>
+    </body>
+</html>
